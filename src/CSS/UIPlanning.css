@@ -1,0 +1,24 @@
+.uiContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 20%;
+    background-color: #f0f0f0;
+    height: 100vh;
+    
+    
+    
+}
+.UiWrapper{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 30%;
+}
+.renderedContainer{
+    width: 80%;
+    padding: 20px;
+    
+    
+}
