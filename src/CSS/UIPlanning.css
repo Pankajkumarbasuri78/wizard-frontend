@@ -13,8 +13,8 @@
 .UiWrapper{
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    gap: 30%;
+    
+    /* gap: 10%; */
 }
 .renderedContainer{
     width: 80%;
@@ -22,3 +22,13 @@
     
     
 }
+  
+  /* Apply the hover effect */
+  .buttonClass:hover {
+    /* background-color: #4caf50; */
+    color: rgb(232, 24, 24);
+  }
+
+/* .rightbar{
+    
+} */

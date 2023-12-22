@@ -120,10 +120,11 @@ const RadioButton = (props) => {
             ))}
           </RadioGroup>
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={addOption}
             disabled={formData.options.length === 4}
             sx={{ mt: 2 }}
+            style={{width:150}}
           >
             Add Option
           </Button>

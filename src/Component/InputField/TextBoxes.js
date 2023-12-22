@@ -122,13 +122,15 @@ const TextBoxes = (props) => {
             </div>
           ))}
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={addOption}
             disabled={formData.options.length === 4}
             sx={{ mt: 2 }}
+            style={{width:150}}
           >
             Add Option
           </Button>
+          
           {/* <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>
             Submit
           </Button> */}

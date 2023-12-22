@@ -10,6 +10,10 @@ import { useNavigate } from "react-router-dom";
 
 import { WizardContext } from "../Context/WizardContext";
 import TextArea from "../Component/InputField/TextAreas";
+import StepTracker from "../Component/StepTracker";
+import Navbar from "./Navbar";
+import UiNavbar from "./UiNavbar";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const UIPlanning = () => {
   const navigate = useNavigate();
@@ -29,7 +33,7 @@ const UIPlanning = () => {
   //console.log("context se hai");
   //console.log(wizardData);
 
-  const { completeFormDataContext, } = useContext(WizardContext);
+  const { completeFormDataContext } = useContext(WizardContext);
 
   console.log("from context");
   console.log(completeFormDataContext);
@@ -127,8 +131,6 @@ const UIPlanning = () => {
 
     // const RemainingData = Object.entries(completeFormDataContext);
     // console.log(RemainingData);
-
-    
   };
   const handleRemoveAllComponent = () => {
     if (selectedComponents.length > 0) {
@@ -150,7 +152,6 @@ const UIPlanning = () => {
 
   const handleNextPage = () => {
     if (currentCount == wizardData.totalSteps) {
-
       alert("over");
     } else {
       setPage(page + 1);
@@ -174,20 +175,21 @@ const UIPlanning = () => {
     //Api caal
     //setSubmitAll(submitAll => submitAll+1);
     //console.log(submitAll);
-    handleRemoveAllComponent()
+    handleRemoveAllComponent();
   };
 
   // useEffect(()=>{
   //   console.log(selectedComponents);
   // },[selectedComponents])
 
-
-  useEffect(()=>{
-    const RemainingData = Object.entries(completeFormDataContext).slice(currentCount,1)
-    console.log("left data",RemainingData);
-console.log("typeof remaiinshdjsguav",typeof(RemainingData));
-     
-  })
+  useEffect(() => {
+    const RemainingData = Object.entries(completeFormDataContext).slice(
+      currentCount,
+      1
+    );
+    console.log("left data", RemainingData);
+    console.log("typeof remaiinshdjsguav", typeof RemainingData);
+  });
 
   useEffect(() => {
     if (
@@ -272,86 +274,127 @@ console.log("typeof remaiinshdjsguav",typeof(RemainingData));
     }
   }, [currentCount]);
 
-  const handleFinalSubmit = ()=>{
-   
-   const combinedObject = {...wizardData,completeFormDataContext};
-   console.log("final data for backend");
-   console.log(combinedObject);
-  }
+  const handleFinalSubmit = () => {
+    const combinedObject = { ...wizardData, completeFormDataContext };
+    console.log("final data for backend");
+    console.log(combinedObject);
+  };
 
   return (
     <>
+      <div>
+        <UiNavbar />
+      </div>
       <div style={{ display: "flex" }}>
-        <div className="uiContainer" style={{ position: "sticky", top: 0 }}>
-          <h4>Step {currentCount}</h4>
-          <h2>Select a Form Element</h2>
-          <div className="UiWrapper">
+        <div
+          className="uiContainer"
+          style={{ position: "sticky", top: 0, gap: 20 }}
+        >
+          {/* <h4>Step {currentCount}</h4> */}
+          <h2 style={{ padding: "10px" }}>Select a Form Element</h2>
+          <div
+            className="UiWrapper"
+            style={{ paddingLeft: "40px", gap: "10px" }}
+          >
             <Button
-              variant="contained"
+              variant="outlined"
               color="success"
+              className="buttonClass"
               onClick={() => handleOptionClick("TextBoxes")}
             >
               Textbox
             </Button>
             <Button
-              variant="contained"
+              variant="outlined"
               color="success"
+              className="buttonClass"
               onClick={() => handleOptionClick("CheckboxComponent")}
             >
               Checkbox
             </Button>
             <Button
-              variant="contained"
+              variant="outlined"
               color="success"
+              className="buttonClass"
               onClick={() => handleOptionClick("DropdownComponent")}
             >
               Dropdown
             </Button>
             <Button
-              variant="contained"
+              variant="outlined"
               color="success"
+              className="buttonClass"
               onClick={() => handleOptionClick("MultiSelectOptionComponent")}
             >
               MultiSelect Option
             </Button>
             <Button
-              variant="contained"
+              variant="outlined"
               color="success"
+              className="buttonClass"
               onClick={() => handleOptionClick("RadioButtonComponent")}
             >
               Radio Button
             </Button>
 
             <Button
-              variant="contained"
+              variant="outlined"
               color="success"
+              className="buttonClass"
               onClick={() => handleOptionClick("TextAreaButtonComponent")}
             >
               Text Area
             </Button>
+
+            {/* <Button
+              variant="outlined"
+              color="success"
+              onClick={handleNextPage}
+              disabled={currentCount == wizardData.totalSteps}
+            >
+              Next
+            </Button>
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={handlePrevPage}
+              disabled={currentCount == 1}
+            >
+              Prev
+            </Button> */}
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={handlePreview}
+              disabled={currentCount < wizardData.totalSteps}
+            >
+              Preview
+            </Button>
+
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleSubmitAll}
+            >
+              Submit
+            </Button>
+            <Button
+              variant="contained"
+              color="success"
+              disabled={currentCount < wizardData.totalSteps}
+              onClick={handleFinalSubmit}
+            >
+              Final Submit
+            </Button>
           </div>
-          <Button variant="contained" color="success"  onClick={handleNextPage}>
-          Next
-          </Button>
-          <Button variant="contained" color="success" onClick={handlePrevPage}>
-          Prev
-          </Button>
-          <Button variant="contained" color="success" onClick={handlePreview} disabled={currentCount < wizardData.totalSteps}>
-            Preview
-          </Button>
-
-          <Button variant="contained" color="success" disabled={currentCount < wizardData.totalSteps} onClick={handleFinalSubmit}>
-            Final Submit
-          </Button>
-          
-
-          <Button variant="contained" color="success" onClick={handleSubmitAll}>
-            Submit
-          </Button>
           {/* //getData={getAccordionDetailsUtilityClass()} */}
         </div>
 
         <div className="renderedContainer">
+          {/* <StepTracker
+            totalSteps={wizardData.totalSteps}
+            currentStep={currentCount}
+          /> */}
           <h1
             style={{
               display: "flex",
@@ -368,27 +411,34 @@ console.log("typeof remaiinshdjsguav",typeof(RemainingData));
               key={index}
               style={{ marginBottom: "20px", position: "relative" }}
             >
-              <h1>{index}</h1>
+              {/* <h1>{index}</h1> */}
               {{ ...Component, props: { ...Component.props, index } }}
-              <Button
+              {/* <Button
                 variant="contained"
                 color="error"
                 onClick={() => handleRemoveComponent(index)}
                 style={{ position: "absolute", top: 100, right: 0 }}
               >
                 Remove
+              </Button> */}
+              <Button
+                variant="outlined"
+                startIcon={<DeleteIcon />}
+                color="error"
+                onClick={() => handleRemoveComponent(index)}
+                style={{ position: "absolute", top: 100, right: 0 }}
+              >
+                Delete
               </Button>
             </div>
           ))}
         </div>
-        <div className="rightbar">
+        {/* <div className="rightbar">
           <h1>hello</h1>
-        </div>
+        </div> */}
       </div>
     </>
   );
 };
 
 export default UIPlanning;
-
-

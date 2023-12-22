@@ -83,9 +83,9 @@ const MultiSelectOption = (props) => {
             variant="outlined"
             sx={{ mb: 2 }}
           />
-          <Button variant="contained" color="primary" type="submit" sx={{ display: 'flex', height: '53px' }}>
+          {/* <Button variant="contained" color="primary" type="submit" sx={{ display: 'flex', height: '53px' }}>
             Submit
-          </Button>
+          </Button> */}
         </div>
 
         <FormControl component="fieldset" sx={{ mb: 4, mt: 2 }}>
@@ -105,10 +105,11 @@ const MultiSelectOption = (props) => {
             </div>
           ))}
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={addOption}
             disabled={formData.options.length === 4}
             sx={{ mt: 2 }}
+            style={{width:150}}
           >
             Add Option
           </Button>

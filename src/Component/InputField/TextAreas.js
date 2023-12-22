@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Typography, TextField, Button, Box } from '@mui/material';
+import { Typography, TextField, Box } from '@mui/material';
 import { WizardContext } from '../../Context/WizardContext';
 
 const TextArea = (props) => {
@@ -83,9 +83,9 @@ const TextArea = (props) => {
             rows={4}
             sx={{ mb: 2 }}
           />
-          <Button variant="contained" color="primary" type="submit">
+          {/* <Button variant="contained" color="primary" type="submit">
             Submit
-          </Button>
+          </Button> */}
         </div>
       </form>
     </Box>
