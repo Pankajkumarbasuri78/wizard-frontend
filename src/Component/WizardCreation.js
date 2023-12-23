@@ -1,15 +1,20 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Navbar from "../Common/Navbar";
-import Typography from '@mui/material/Typography';
+import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
-import {WizardContext} from "../Context/WizardContext"
+import { WizardContext } from "../Context/WizardContext";
+import Tooltip from "@mui/material/Tooltip";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 
 const WizardCreation = () => {
+  const { wizardData, setWizardData } = useContext(WizardContext);
 
-  const { wizardData, setWizardData } = useContext(WizardContext)
+
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
 
@@ -18,85 +23,138 @@ const WizardCreation = () => {
     const value = e.target.value;
     //const { name, value } = e.target;
 
-    let newValue = value;
-    const regex = /^[a-zA-Z\s]*$/;
+    setWizardData({ ...wizardData, [name]: value });
+  };
 
-    if(!regex.test(value)){
-      newValue = value.replace(/[^a-zA-Z\s]/g, '');
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = {};
+
+    //validation for title field
+    if (!wizardData.title || wizardData.title.trim() === "") {
+      newErrors.title = "Title is required";
+      valid = false;
+    } else if (wizardData.title.length < 10) {
+      newErrors.title = "Title must be big";
+      valid = false;
     }
 
+    //validation for desc
+    if (!wizardData.description || wizardData.description.trim() === "") {
+      newErrors.description = "Description is required";
+      valid = false;
+    } else if (wizardData.description.length < 20) {
+      newErrors.description = "description must be atleast 20 lines";
+      valid = false;
+    }
 
-    
-    setWizardData({ ...wizardData, [name]: value });
+    //validation for totalSteps
+    if (!wizardData.totalSteps || isNaN(wizardData.totalSteps)) {
+      newErrors.totalSteps = "Total steps must be a number";
+      valid = false;
+    }
+
+    // console.log("valid",valid);
+    // console.log(errors);
+    setErrors(newErrors);
+    return valid;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     console.log(wizardData);
-
-    setWizardData(wizardData);
-
-      //navigate('/ui',{ state: { formData } })
-      navigate('/ui')
+    if (validateForm()) {
+      setWizardData(wizardData);
+      // setTimeout(() => {
+      //   navigate("/ui");
+      // }, 1000);
+      toast.success("Wizard creation successful!", {
+        //autoClose: 2000,
+        onClose: () => navigate("/ui"),
+      });
+    }
   };
 
-  const handleNextClick = () => {
-    console.log('Next button clicked');
-    
-  };
-
+  
 
   return (
     <>
       <Navbar />
+      <Tooltip
+          describeChild
+          title="This is a Wizard UI Builder where you can work with different input fields"
+        >
       <Box sx={{ maxWidth: 400, margin: "auto", padding: "20px" }}>
-        <Typography variant="h4" gutterBottom>
-           Initiate Your New Wizard
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Give Title of WizardForm"
-            name="title"
-            value={wizardData.title}
-            onChange={handleInputChange}
-            margin="normal"
-            required
-          />
-          <TextField
-            fullWidth
-            label="Give Description of WizardForm"
-            name="description"
-            value={wizardData.description}
-            onChange={handleInputChange}
-            margin="normal"
-            multiline
-            rows={4}
-            required
-            
-          />
-          <TextField
-            fullWidth
-            label="Total Steps"
-            name="totalSteps"
-            value={wizardData.totalSteps}
-            onChange={handleInputChange}
-            margin="normal"
-            type="number"
-            required
-          />
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleSubmit}
-            sx={{ mt: 2,paddingLeft:22.5,paddingRight:22.5 }}
-          >
-            Next
-          </Button>
-          
-        </form>
+        
+          <Typography variant="h4" gutterBottom>
+            Initiate Your New Wizard
+          </Typography>
+
+          {/* <Typography variant="h4" gutterBottom>
+          Initiate Your New Wizard
+        </Typography> */}
+          <form>
+            <TextField
+              fullWidth
+              label="Give Title of WizardForm"
+              name="title"
+              value={wizardData.title}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+              error={Boolean(errors.title)}
+              helperText={errors.title}
+            />
+            {/* <span style={{fontSize:'14px',color:'red'}}>{errors.title}</span> */}
+            <TextField
+              fullWidth
+              label="Give Description of WizardForm"
+              name="description"
+              value={wizardData.description}
+              onChange={handleInputChange}
+              margin="normal"
+              multiline
+              rows={4}
+              required
+              error={Boolean(errors.description)}
+              helperText={errors.description}
+            />
+            <TextField
+              fullWidth
+              label="Total Steps"
+              name="totalSteps"
+              value={wizardData.totalSteps}
+              onChange={handleInputChange}
+              margin="normal"
+              type="number"
+              required
+              error={Boolean(errors.totalSteps)}
+              helperText={errors.totalSteps}
+            />
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleSubmit}
+              sx={{ mt: 2, paddingLeft: 22.5, paddingRight: 22.5 }}
+            >
+              Next
+            </Button>
+          </form>
+        
       </Box>
+      </Tooltip>
+      <ToastContainer
+        position="bottom-left"
+        autoClose={false}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   );
 };
