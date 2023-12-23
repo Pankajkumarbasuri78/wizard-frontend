@@ -17,6 +17,15 @@ const WizardCreation = () => {
     const name = e.target.name;
     const value = e.target.value;
     //const { name, value } = e.target;
+
+    let newValue = value;
+    const regex = /^[a-zA-Z\s]*$/;
+
+    if(!regex.test(value)){
+      newValue = value.replace(/[^a-zA-Z\s]/g, '');
+    }
+
+
     
     setWizardData({ ...wizardData, [name]: value });
   };
@@ -65,6 +74,7 @@ const WizardCreation = () => {
             multiline
             rows={4}
             required
+            
           />
           <TextField
             fullWidth
@@ -77,18 +87,10 @@ const WizardCreation = () => {
             required
           />
           <Button
-            variant="contained"
+            variant="outlined"
             color="primary"
-            type="submit"
-            sx={{ mt: 2, mr: 30 }}
-          >
-            Next
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNextClick}
-            sx={{ mt: 2 }}
+            onClick={handleSubmit}
+            sx={{ mt: 2,paddingLeft:22.5,paddingRight:22.5 }}
           >
             Next
           </Button>

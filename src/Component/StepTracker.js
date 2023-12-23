@@ -13,7 +13,7 @@ const StepTracker = ({ totalSteps, currentStep }) => {
 
   return (
   <>
-  <div className="stepTracker">{totalsteps}</div>
+  <div className={totalSteps < 17 ?'stepTracker':'stepTracker1'}>{totalsteps}</div>
   </>
   );
 };

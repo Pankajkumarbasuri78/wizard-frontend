@@ -1,15 +1,33 @@
+
 /* Example CSS styles */
 .stepTracker {
     display: flex;
-    flex-wrap: wrap;
+    /* flex-wrap: wrap; */
+    
+    max-width: 600px;
     margin: 10px 0;
+  }
+  
+  .stepTracker1 {
+    display: flex;
+    /* flex-wrap: wrap; */
+    overflow-x: scroll;
+    width: 600px;
+    margin: 10px 0;
+    
+  }
+  .stepTracker1::-webkit-scrollbar {
+    display: none;
+  }
+  .stepTracker1::-webkit-scrollbar-thumb{
+    display: block;
   }
   
   .activeStep {
     background-color: #00bcd4;
     color: white;
-    width: 20px;
-    height: 20px;
+    min-width: 25px;
+    min-height: 25px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -20,8 +38,8 @@
   .inactiveStep {
     border: 1px solid #ccc;
     color: #ccc;
-    width: 20px;
-    height: 20px;
+    min-width: 25px;
+    min-height: 25px;
     border-radius: 50%;
     display: flex;
     justify-content: center;

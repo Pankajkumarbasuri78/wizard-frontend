@@ -22,9 +22,6 @@ const App = () => {
         <Route path="/" element={<HomePage/>}/>
         <Route path="/wizard-creation" element={<WizardCreation/>}/>
         <Route path="/ui" element={<UIPlanning/>}/>
-        <Route path="/ui/1" element={<UIPlanning/>}/>
-        <Route path="/ui/2" element={<UIPlanning/>}/>
-        <Route path="/ui/3" element={<UIPlanning/>}/>
 
 
         

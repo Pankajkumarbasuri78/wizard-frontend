@@ -98,6 +98,14 @@ const UiNavbar = () => {
             >
               Next
             </Button>
+            <Button
+              variant="outlined"
+              color="success"
+              //onClick={handlePreview}
+              disabled={currentCount < wizardData.totalSteps}
+            >
+              Preview
+            </Button>
           </div>
 
           {/* <Button color="inherit">Login</Button> */}

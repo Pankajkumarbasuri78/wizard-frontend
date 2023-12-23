@@ -278,6 +278,8 @@ const UIPlanning = () => {
     const combinedObject = { ...wizardData, completeFormDataContext };
     console.log("final data for backend");
     console.log(combinedObject);
+
+    navigate('/')
   };
 
   return (
