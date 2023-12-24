@@ -7,28 +7,33 @@ import { WizardContext } from '../../Context/WizardContext';
 const CheckboxComponent = (props) => {
 
   //global state
-  const {completeFormDataContext,setCompleteFormDataContext,currentCount} = useContext(WizardContext)
+  const {completeFormDataContext,setCompleteFormDataContext,currentCount,id,setId} = useContext(WizardContext)
 
   // useEffect(()=>{
-  //   console.log('object',Object.keys(props).includes('question')?props.question:'');
+  //   // console.log('object',Object.keys(props).includes('question')?props.question:'');
+  //   setId(id+1)
   // })
+  
 
   const [formData, setFormData] = useState({
     page:currentCount,
-    type:'checkbox',
+    type:"checkbox",
     question: Object.keys(props).includes('question')?props.question:'',
     options: Object.keys(props).includes('options')?props.options:[],
     Uid: props.uniqueId
   });
 
   const handleQuestionChange = (e) => {
+    console.log("formmmmmmmmm",formData.Uid);
     setFormData({ ...formData, question: e.target.value });
+    updateCompleteFormData(formData.Uid, { ...formData, question: e.target.value });
   };
 
   const handleOptionChange = (index, value) => {
     const updatedOptions = [...formData.options];
     updatedOptions[index] = value;
     setFormData({ ...formData, options: updatedOptions });
+    updateCompleteFormData(formData.Uid, { ...formData, options: updatedOptions });
   };
 
   const addOption = () => {
@@ -43,32 +48,22 @@ const CheckboxComponent = (props) => {
     setFormData({ ...formData, options: updatedOptions });
   };
 
-  // const handleSubmit = (e) => {
-  //   //e.preventDefault();
-    
-  //   console.log('Submitted:', { formData });
-  //   setGlobalSeq(globalSeq+1);
+  const updateCompleteFormData = (uid, updatedData) => {
+    setId(id+1);
+    if(uid){
+    setCompleteFormDataContext((prevContext) => ({
+      ...prevContext,
+      [formData.page]: {
+        ...prevContext[formData.page],
+        [uid]: updatedData,
+      },
+    }));}
+  };
 
-  //   const textBoxUpdate = structuredClone(completeFormDataContext)
-  //   textBoxUpdate.checkboxes.push(formData)
-  //   console.log("texboxcontext");
-  //   console.log(textBoxUpdate);
+useEffect(()=>{
+  updateCompleteFormData(formData.Uid,formData);
+},[])
 
-  //   setCompleteFormDataContext(textBoxUpdate);
-
-  //   //onRemove();
-  //   setFormData({
-  //     question: '',
-  //     options: [],
-  //   });
-  // };
-
-  useEffect(()=>{
-    setCompleteFormDataContext((prevContext)=>({...prevContext,[formData.page]:{
-      ...prevContext[formData.page],[formData.Uid]:formData
-    }}))
-    console.log(completeFormDataContext);
-  },[formData])
 
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', padding: '20px', backgroundColor: '#F3F5F0', borderRadius: '8px', boxShadow: '0px 3px 6px #00000029' }}>
@@ -91,7 +86,7 @@ const CheckboxComponent = (props) => {
           </Button> */}
         </div>
 
-        <FormControl component="fieldset" sx={{ mb: 4, mt: 2 }}>
+        {/* <FormControl component="fieldset" sx={{ mb: 4, mt: 2 }}> */}
           {formData.options.map((option, index) => (
             <div key={index} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: '8px', backgroundColor: '#ffffff', boxShadow: '0px 3px 6px #00000029', borderRadius: '8px', padding: '8px' }}>
               <Checkbox
@@ -121,7 +116,7 @@ const CheckboxComponent = (props) => {
           >
             Add Option
           </Button>
-        </FormControl>
+        {/* </FormControl> */}
       </form>
     </Box>
   );

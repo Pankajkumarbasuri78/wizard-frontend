@@ -44,7 +44,7 @@ const WizardCreation = () => {
       newErrors.description = "Description is required";
       valid = false;
     } else if (wizardData.description.length < 20) {
-      newErrors.description = "description must be atleast 20 lines";
+      newErrors.description = "description must be atleast 20 character";
       valid = false;
     }
 
@@ -70,7 +70,7 @@ const WizardCreation = () => {
       //   navigate("/ui");
       // }, 1000);
       toast.success("Wizard creation successful!", {
-        //autoClose: 2000,
+        autoClose: 1000,
         onClose: () => navigate("/ui"),
       });
     }

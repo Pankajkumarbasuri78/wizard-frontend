@@ -4,7 +4,7 @@ import { WizardContext } from '../../Context/WizardContext';
 
 const TextArea = (props) => {
   // Global state,
-  const { completeFormDataContext, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
+  const { completeFormDataContext,setId,id, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
 
   // Local state
   const [formData, setFormData] = useState({
@@ -21,11 +21,38 @@ const TextArea = (props) => {
 
   const handleQuestionChange = (e) => {
     setFormData({ ...formData, question: e.target.value });
+    updateCompleteFormData(formData.Uid, {
+      ...formData,
+      question: e.target.value,
+    });
   };
 
   const handleDescriptionChange = (e) => {
     setFormData({ ...formData, textDescription: e.target.value });
+    updateCompleteFormData(formData.Uid, {
+      ...formData,
+      textDescription: e.target.value,
+    });
   };
+
+  const updateCompleteFormData = (uid, updatedData) => {
+    setId(id + 1);
+    console.log("id", id);
+    console.log("ccccc",completeFormDataContext,"insert",formData.page,"pre",uid,"--",updatedData);
+    // if(uid && updatedData){
+      
+    setCompleteFormDataContext((prevContext) => ({
+      ...prevContext,
+      [formData.page]: {
+        ...prevContext[formData.page],
+        [uid]: updatedData,
+      },
+    }));
+  };
+
+  useEffect(() => {
+    updateCompleteFormData(formData.Uid, formData);
+  }, []);
 
   // const handleSubmit = (e) => {
   //   e.preventDefault();
@@ -46,15 +73,15 @@ const TextArea = (props) => {
   //   });
   // };
 
-  useEffect(()=>{
-    console.log("ssssss");
-    console.log(formData);
-    setCompleteFormDataContext((prevContext)=>({...prevContext,[formData.page]:{
-      ...prevContext[formData.page],[formData.Uid]:formData
-    }}))
-    console.log(completeFormDataContext);
-    console.log(formData);
-  },[formData])
+  // useEffect(()=>{
+  //   console.log("ssssss");
+  //   console.log(formData);
+  //   setCompleteFormDataContext((prevContext)=>({...prevContext,[formData.page]:{
+  //     ...prevContext[formData.page],[formData.Uid]:formData
+  //   }}))
+  //   console.log(completeFormDataContext);
+  //   console.log(formData);
+  // },[formData])
 
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', padding: '20px', backgroundColor: '#F3F5F0', borderRadius: '8px', boxShadow: '0px 3px 6px #00000029' }}>

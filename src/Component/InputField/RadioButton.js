@@ -7,7 +7,7 @@ import { WizardContext } from '../../Context/WizardContext';
 const RadioButton = (props) => {
 
   //global state
-  const {completeFormDataContext,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
+  const {completeFormDataContext,setId,id,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
 
 
   const [formData, setFormData] = useState({
@@ -20,12 +20,20 @@ const RadioButton = (props) => {
 
   const handleQuestionChange = (e) => {
     setFormData({ ...formData, question: e.target.value });
+    updateCompleteFormData(formData.Uid, {
+      ...formData,
+      question: e.target.value,
+    });
   };
 
   const handleOptionChange = (index, value) => {
     const updatedOptions = [...formData.options];
     updatedOptions[index] = value;
     setFormData({ ...formData, options: updatedOptions });
+    updateCompleteFormData(formData.Uid, {
+      ...formData,
+      options: updatedOptions,
+    });
   };
 
   const addOption = () => {
@@ -40,6 +48,24 @@ const RadioButton = (props) => {
     setFormData({ ...formData, options: updatedOptions });
   };
 
+  const updateCompleteFormData = (uid, updatedData) => {
+    setId(id + 1);
+    console.log("id", id);
+    console.log("ccccc",completeFormDataContext,"insert",formData.page,"pre",uid,"--",updatedData);
+    // if(uid && updatedData){
+      
+    setCompleteFormDataContext((prevContext) => ({
+      ...prevContext,
+      [formData.page]: {
+        ...prevContext[formData.page],
+        [uid]: updatedData,
+      },
+    }));
+  };
+
+  useEffect(() => {
+    updateCompleteFormData(formData.Uid, formData);
+  }, []);
   // const handleSubmit = (e) => {
   //   e.preventDefault();
   //   setGlobalSeq(globalSeq+1);
@@ -65,15 +91,15 @@ const RadioButton = (props) => {
 
   // };
 
-  useEffect(()=>{
-    console.log("ssssss");
-    console.log(formData);
-    setCompleteFormDataContext((prevContext)=>({...prevContext,[formData.page]:{
-      ...prevContext[formData.page],[formData.Uid]:formData
-    }}))
-    console.log(completeFormDataContext);
-    console.log(formData);
-  },[formData])
+  // useEffect(()=>{
+  //   console.log("ssssss");
+  //   console.log(formData);
+  //   setCompleteFormDataContext((prevContext)=>({...prevContext,[formData.page]:{
+  //     ...prevContext[formData.page],[formData.Uid]:formData
+  //   }}))
+  //   console.log(completeFormDataContext);
+  //   console.log(formData);
+  // },[formData])
 
 
   return (

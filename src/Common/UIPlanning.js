@@ -14,6 +14,7 @@ import StepTracker from "../Component/StepTracker";
 import Navbar from "./Navbar";
 import UiNavbar from "./UiNavbar";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { v4 as uuidv4 } from 'uuid';
 
 const UIPlanning = () => {
   const navigate = useNavigate();
@@ -28,15 +29,15 @@ const UIPlanning = () => {
     page,
     currentCount,
     setCurrentCount,
+    id,setId
   } = useContext(WizardContext);
 
   //console.log("context se hai");
   //console.log(wizardData);
 
-  const { completeFormDataContext } = useContext(WizardContext);
+  const { completeFormDataContext,setCompleteFormDataContext } = useContext(WizardContext);
 
-  console.log("from context");
-  console.log(completeFormDataContext);
+  console.log("from context Completeformdata",completeFormDataContext);
 
   const [completeFormData, setCompleteFormState] = useState({
     textBoxes: [],
@@ -47,7 +48,7 @@ const UIPlanning = () => {
   });
 
   const handleOptionClick = (option) => {
-    console.log("sssssss");
+    
     switch (option) {
       case "TextBoxes":
         console.log("SSSSSS", selectedComponents);
@@ -55,11 +56,11 @@ const UIPlanning = () => {
           ...selectedComponents,
           <TextBoxes
             key={selectedComponents.length}
-            uniqueId={selectedComponents.length}
+            uniqueId={id}
             //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
           />,
         ]);
-        console.log("SSSSSS");
+       
         break;
 
       case "CheckboxComponent":
@@ -67,7 +68,7 @@ const UIPlanning = () => {
           ...selectedComponents,
           <CheckboxComponent
             key={selectedComponents.length}
-            uniqueId={selectedComponents.length}
+            uniqueId={id}
             //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
           />,
         ]);
@@ -124,16 +125,31 @@ const UIPlanning = () => {
     }
   };
 
-  const handleRemoveComponent = (index) => {
+  const handleRemoveComponent = (index,Uid) => {
+    
+    console.log("1111111111111111",index);
     const updatedComponents = [...selectedComponents];
-    updatedComponents.splice(index, 1);
+    updatedComponents.splice(index, 1)
     setSelectedComponents(updatedComponents);
 
-    // const RemainingData = Object.entries(completeFormDataContext);
-    // console.log(RemainingData);
+    console.log("uniquiiDDDD",Uid);
+
+    setCompleteFormDataContext((prevContext) => {
+      const updatedContext = { ...prevContext };
+      const currentPageData = updatedContext[currentCount];
+  
+      console.log("currentPageDtaa",currentPageData);
+      if (currentPageData && currentPageData[Uid]) {
+        delete currentPageData[Uid];
+        updatedContext[currentCount] = currentPageData;
+      }
+  
+      return updatedContext;
+    });
+
   };
   const handleRemoveAllComponent = () => {
-    if (selectedComponents.length > 0) {
+    if (selectedComponents.length > 0) {  
       const updatedComponents = [...selectedComponents];
       updatedComponents.splice(0, selectedComponents.length);
       setSelectedComponents(updatedComponents);
@@ -148,7 +164,7 @@ const UIPlanning = () => {
     navigate("/preview");
   };
 
-  console.log("Form State:", completeFormDataContext);
+  //console.log("Form State:", completeFormDataContext);
 
   const handleNextPage = () => {
     if (currentCount == wizardData.totalSteps) {
@@ -182,19 +198,18 @@ const UIPlanning = () => {
   //   console.log(selectedComponents);
   // },[selectedComponents])
 
-  useEffect(() => {
-    const RemainingData = Object.entries(completeFormDataContext).slice(
-      currentCount,
-      1
-    );
-    console.log("left data", RemainingData);
-    console.log("typeof remaiinshdjsguav", typeof RemainingData);
-  });
+  // useEffect(() => {
+  //   const RemainingData = Object.entries(completeFormDataContext).slice(
+  //     currentCount,
+  //     1
+  //   );
+  //   console.log("left data", RemainingData);
+  //   console.log("typeof remaiinshdjsguav", typeof RemainingData);
+  // });
 
   useEffect(() => {
-    if (
-      Object.keys(completeFormDataContext).includes(currentCount.toString())
-    ) {
+    if (Object.keys(completeFormDataContext).includes(currentCount.toString())) 
+    {
       //console.log('consoled');
       const filteredData = Object.values(
         completeFormDataContext?.[currentCount]
@@ -220,8 +235,8 @@ const UIPlanning = () => {
           case "checkbox":
             return (
               <CheckboxComponent
-                key={selectedComponents.length}
-                uniqueId={selectedComponents.length}
+                key={filterData.Uid}
+                uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
 
@@ -232,8 +247,8 @@ const UIPlanning = () => {
           case "radio":
             return (
               <RadioButton
-                key={selectedComponents.length}
-                uniqueId={selectedComponents.length}
+                key={filterData.Uid}
+                uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
                 //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
@@ -243,8 +258,8 @@ const UIPlanning = () => {
           case "mcq":
             return (
               <MultiSelectOption
-                key={selectedComponents.length}
-                uniqueId={selectedComponents.length}
+                key={filterData.Uid}
+                uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
                 //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
@@ -254,8 +269,8 @@ const UIPlanning = () => {
           case "textarea":
             return (
               <TextArea
-                key={selectedComponents.length}
-                uniqueId={selectedComponents.length}
+                key={filterData.Uid}
+                uniqueId={filterData.Uid}
                 question={filterData.question}
                 textDescription={filterData.textDescription}
                 //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
@@ -407,7 +422,8 @@ const UIPlanning = () => {
             {wizardData.title}
           </h1>
           {console.log("selectedComponent:", selectedComponents)}
-          {console.log("typeof ", typeof selectedComponents)}
+          {/* {console.log("typeof ", typeof(selectedComponents))} */}
+
           {selectedComponents.map((Component, index) => (
             <div
               key={index}
@@ -415,6 +431,7 @@ const UIPlanning = () => {
             >
               {/* <h1>{index}</h1> */}
               {{ ...Component, props: { ...Component.props, index } }}
+              {/* {console.log("comccccccc",Component)} */}
               {/* <Button
                 variant="contained"
                 color="error"
@@ -427,13 +444,14 @@ const UIPlanning = () => {
                 variant="outlined"
                 startIcon={<DeleteIcon />}
                 color="error"
-                onClick={() => handleRemoveComponent(index)}
+                onClick={() => handleRemoveComponent(index,Component.props.uniqueId)}
                 style={{ position: "absolute", top: 100, right: 0 }}
               >
                 Delete
               </Button>
             </div>
           ))}
+          
         </div>
         {/* <div className="rightbar">
           <h1>hello</h1>

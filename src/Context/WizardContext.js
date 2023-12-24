@@ -10,6 +10,8 @@ const WizardContextProvider = ({ children }) => {
     totalSteps: "",
   });
 
+  const [id,setId] = useState(1);
+
   // const [completeFormDataContext,setCompleteFormDataContext] = useState({
   //   textBoxes: [],
   //   checkboxes: [],
@@ -72,6 +74,7 @@ const WizardContextProvider = ({ children }) => {
     setPage,
     currentCount,
     setCurrentCount,
+    id,setId
   };
 
   return (
