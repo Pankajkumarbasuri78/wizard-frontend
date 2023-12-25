@@ -106,7 +106,9 @@ const UiNavbar = () => {
             >
               Next
             </Button>
-            <Button
+            
+          </div>
+          <Button
               variant="contained"
               color="success"
               onClick={handlePreview}
@@ -114,7 +116,6 @@ const UiNavbar = () => {
             >
               Preview
             </Button>
-          </div>
 
           {/* <Button color="inherit">Login</Button> */}
         </Toolbar>

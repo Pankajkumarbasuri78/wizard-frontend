@@ -36,6 +36,16 @@ const TextBoxes = (props) => {
     //seq: globalSeq,
     Uid: props.uniqueId,
   });
+  
+
+  const validateQuestion = (value)=>{
+    if(!value || value.trim() === ""){
+      return "Question is Required"
+    }else if(value[0] !== value[0].toUpperCase()){
+      return "Question should start with an uppercase letter"
+    }
+    return "";
+  }
 
   const handleQuestionChange = (e) => {
     console.log("formmmmmmmmm", formData.Uid);
@@ -44,6 +54,7 @@ const TextBoxes = (props) => {
       ...formData,
       question: e.target.value,
     });
+    const errorMessage =validateQuestion(e.target.value);
   };
 
   const handleOptionChange = (index, value) => {
@@ -145,6 +156,8 @@ const TextBoxes = (props) => {
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
+            error={Boolean(validateQuestion(formData.question))}
+            helperText={validateQuestion(formData.question)}
           />
 
           {formData.options.map((option, index) => (
