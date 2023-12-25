@@ -6,12 +6,15 @@ import Toolbar from "@mui/material/Toolbar";
 //import Button from '@mui/material/Button';
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import StepTracker from "../Component/StepTracker";
 import { WizardContext } from "../Context/WizardContext";
 import Button from "@mui/material/Button";
 
 const UiNavbar = () => {
+
+  const navigate = useNavigate();
+
   const {
     wizardData,
     currentCount,
@@ -51,6 +54,11 @@ const UiNavbar = () => {
     } else {
       alert("negative");
     }
+  };
+
+  const handlePreview = () => {
+    //navigate('/preview',{ state: { completeFormData: completeFormData } })
+    navigate("/preview");
   };
 
   return (
@@ -99,9 +107,9 @@ const UiNavbar = () => {
               Next
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               color="success"
-              //onClick={handlePreview}
+              onClick={handlePreview}
               disabled={currentCount < wizardData.totalSteps}
             >
               Preview

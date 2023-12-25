@@ -191,6 +191,8 @@ const UIPlanning = () => {
     //Api caal
     //setSubmitAll(submitAll => submitAll+1);
     //console.log(submitAll);
+    setPage(page + 1);
+    setCurrentCount(currentCount + 1);
     handleRemoveAllComponent();
   };
 
@@ -379,14 +381,14 @@ const UIPlanning = () => {
             >
               Prev
             </Button> */}
-            <Button
+            {/* <Button
               variant="outlined"
               color="success"
               onClick={handlePreview}
               disabled={currentCount < wizardData.totalSteps}
             >
               Preview
-            </Button>
+            </Button> */}
 
             <Button
               variant="contained"

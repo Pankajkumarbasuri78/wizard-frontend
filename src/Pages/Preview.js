@@ -142,7 +142,7 @@ const Preview = () => {
         <div key={index}>
           <h2>Page {index + 1}</h2>
           {Object.values(page).map((question, questionIndex) => (
-            <div key={questionIndex} className="question-container">
+            <div key={questionIndex}>
               <h3>Question {questionIndex + 1}</h3>
               <p>Type: {question.type}</p>
               <p>Question: {question.question}</p>
