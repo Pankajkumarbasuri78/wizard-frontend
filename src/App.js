@@ -9,9 +9,10 @@ import UIPlanning from "./Common/UIPlanning";
 // import CheckBox from "./Component/InputField/Checkbox";
 // import MultiSelectOption from "./Component/InputField/MultiSelectOption";
 // import Dropdown from "./Component/InputField/Dropdown";
-import DesignPage from "./Pages/DesignPage";
+
 import Preview from "./Pages/Preview";
 import { WizardContextProvider } from "./Context/WizardContext";
+import DisplayPage from "./Pages/DisplayPage";
 const App = () => {
   return (
     <>
@@ -30,7 +31,7 @@ const App = () => {
         <Route path="/textbox" element={<TextBoxes/>}/>
         <Route path="/MultiSelect" element={<MultiSelectOption/>}/>
         <Route path="/dropdown" element={<Dropdown/>}/> */}
-        <Route path="/designPage" element={<DesignPage/>}/>
+        <Route path="/displayPage" element={<DisplayPage/>}/>
         <Route path="/preview" element={<Preview/>}/>
       </Routes>
       </WizardContextProvider>

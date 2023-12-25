@@ -15,6 +15,7 @@ import Navbar from "./Navbar";
 import UiNavbar from "./UiNavbar";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 const UIPlanning = () => {
   const navigate = useNavigate();
@@ -296,7 +297,20 @@ const UIPlanning = () => {
     console.log("final data for backend");
     console.log(combinedObject);
 
-    navigate('/')
+    axios.post('http://localhost:8080/saveData',combinedObject,{
+      headers:{
+        'Content-Type':'application/json',
+      }
+    }) 
+    .then((response) => {
+      console.log('Data sent to the backend successfully:', response.data);
+      navigate('/');
+    })
+    .catch((error) => {
+      console.error('Error sending data to the backend:', error.message);
+    });
+
+    // navigate('/')
   };
 
   return (

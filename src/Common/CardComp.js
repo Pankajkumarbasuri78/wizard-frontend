@@ -8,8 +8,26 @@ import Avatar from '@mui/material/Avatar';
 import { grey } from '@mui/material/colors';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import Box from '@mui/material/Box';
+import axios from 'axios';
+import {useNavigate} from 'react-router-dom'
 
 const CardComp = ({title}) => {
+
+  const navigate = useNavigate();
+
+  const handleData = (id) => {
+    // axios.get('http://localhost:8080/getData')
+    axios.get(`http://localhost:8080/getData/${id}`)
+    .then((response) => {
+      const dataById = JSON.parse(response.data.jsonData);
+      console.log(`Data retrieved for ID ${id}:`, dataById);
+      navigate('/displayPage',{state:{dataById}})
+    })
+    .catch((error) => {
+      console.error(`Error fetching data for ID ${id} from the backend:`, error.message);
+    });
+  };
+
   return (
     <Card sx={{ minWidth: 275 }}>
       <CardContent sx={{textAlign:'center'}}>
@@ -24,7 +42,7 @@ const CardComp = ({title}) => {
         </Box>
       </CardContent>
       <CardActions sx={{display:'flex',justifyContent:'center',alignItems:'center'}}>
-        <Button size="large">{title} </Button>
+        <Button size="large" onClick={()=>handleData(5)}>{title} </Button>
       </CardActions>
     </Card>
   )
