@@ -59,6 +59,10 @@ const WizardContextProvider = ({ children }) => {
 
   const [currentCount, setCurrentCount] = useState(1);
 
+  const [isValid,setIsValid] = useState(false);
+
+  
+
   const contextValue = {
     wizardData,
     setWizardData,
@@ -74,7 +78,9 @@ const WizardContextProvider = ({ children }) => {
     setPage,
     currentCount,
     setCurrentCount,
-    id,setId
+    id,setId,
+    isValid,setIsValid
+    
   };
 
   return (

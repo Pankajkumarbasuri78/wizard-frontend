@@ -34,34 +34,43 @@ const WizardCreation = () => {
     if (!wizardData.title || wizardData.title.trim() === "") {
       newErrors.title = "Title is required";
       valid = false;
-    }else if (!/^[a-zA-Z]/.test(wizardData.title)) {
+    }
+    else if (!/^[a-zA-Z]/.test(wizardData.title)) {
       newErrors.title = "Title should start with a letter";
       valid = false;
-    }else if(wizardData.title[0] !== wizardData.title[0].toUpperCase()){
+    }
+    else if(wizardData.title[0] !== wizardData.title[0].toUpperCase()){
       newErrors.title="Title should start with an uppercase letter";
       valid=false;
-    }else if(/^\d/.test(wizardData.title)){
+    }
+    else if(/^\d/.test(wizardData.title)){
       newErrors.title = "Title should not start with a number";
       valid = false;
-    }else if (wizardData.title.length < 10) {
+    }
+    else if (wizardData.title.length < 10) {
       newErrors.title = "Title must be at least 10 characters long";
       valid = false;
     }
 
+    
     //validation for desc
     if (!wizardData.description || wizardData.description.trim() === "") {
       newErrors.description = "Description is required";
       valid = false;
-    }else if (!/^[a-zA-Z]/.test(wizardData.description)) {
+    }
+    else if (!/^[a-zA-Z]/.test(wizardData.description)) {
       newErrors.description = "Description should start with a letter";
       valid = false;
-    }else if(wizardData.description[0] !== wizardData.description[0].toUpperCase()){
+    }
+    else if(wizardData.description[0] !== wizardData.description[0].toUpperCase()){
       newErrors.description="Description should start with an uppercase letter";
       valid=false;
-    }else if(/^\d/.test(wizardData.description)){
+    }
+    else if(/^\d/.test(wizardData.description)){
       newErrors.description = "Description should not start with a number";
       valid = false;
-    } else if (wizardData.description.length < 20) {
+    } 
+    else if (wizardData.description.length < 20) {
       newErrors.description = "Description must be atleast 20 character";
       valid = false;
     }

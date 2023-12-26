@@ -14,8 +14,9 @@ import StepTracker from "../Component/StepTracker";
 import Navbar from "./Navbar";
 import UiNavbar from "./UiNavbar";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { v4 as uuidv4 } from 'uuid';
-import axios from 'axios';
+import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 const UIPlanning = () => {
   const navigate = useNavigate();
@@ -30,15 +31,21 @@ const UIPlanning = () => {
     page,
     currentCount,
     setCurrentCount,
-    id,setId
+    id,
+    setId,
+    isValid,
+    setIsValid,
+    userId,
+    setUserId
   } = useContext(WizardContext);
 
   //console.log("context se hai");
   //console.log(wizardData);
 
-  const { completeFormDataContext,setCompleteFormDataContext } = useContext(WizardContext);
+  const { completeFormDataContext, setCompleteFormDataContext } =
+    useContext(WizardContext);
 
-  console.log("from context Completeformdata",completeFormDataContext);
+  console.log("from context Completeformdata", completeFormDataContext);
 
   const [completeFormData, setCompleteFormState] = useState({
     textBoxes: [],
@@ -49,7 +56,6 @@ const UIPlanning = () => {
   });
 
   const handleOptionClick = (option) => {
-    
     switch (option) {
       case "TextBoxes":
         console.log("SSSSSS", selectedComponents);
@@ -61,7 +67,7 @@ const UIPlanning = () => {
             //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
           />,
         ]);
-       
+
         break;
 
       case "CheckboxComponent":
@@ -126,31 +132,29 @@ const UIPlanning = () => {
     }
   };
 
-  const handleRemoveComponent = (index,Uid) => {
-    
-    console.log("1111111111111111",index);
+  const handleRemoveComponent = (index, Uid) => {
+    console.log("1111111111111111", index);
     const updatedComponents = [...selectedComponents];
-    updatedComponents.splice(index, 1)
+    updatedComponents.splice(index, 1);
     setSelectedComponents(updatedComponents);
 
-    console.log("uniquiiDDDD",Uid);
+    console.log("uniquiiDDDD", Uid);
 
     setCompleteFormDataContext((prevContext) => {
       const updatedContext = { ...prevContext };
       const currentPageData = updatedContext[currentCount];
-  
-      console.log("currentPageDtaa",currentPageData);
+
+      console.log("currentPageDtaa", currentPageData);
       if (currentPageData && currentPageData[Uid]) {
         delete currentPageData[Uid];
         updatedContext[currentCount] = currentPageData;
       }
-  
+
       return updatedContext;
     });
-
   };
   const handleRemoveAllComponent = () => {
-    if (selectedComponents.length > 0) {  
+    if (selectedComponents.length > 0) {
       const updatedComponents = [...selectedComponents];
       updatedComponents.splice(0, selectedComponents.length);
       setSelectedComponents(updatedComponents);
@@ -188,14 +192,23 @@ const UIPlanning = () => {
     }
   };
 
-  const handleSubmitAll = () => {
-    //Api caal
-    //setSubmitAll(submitAll => submitAll+1);
-    //console.log(submitAll);
-    setPage(page + 1);
-    setCurrentCount(currentCount + 1);
-    handleRemoveAllComponent();
-  };
+    const handleSubmitAll = () => {
+      if (isValid) {
+        toast.success("Ready to go Next Page", {
+          autoClose: 500,
+          onClose: () => {
+            setPage(page + 1);
+            setCurrentCount(currentCount + 1);
+            handleRemoveAllComponent();
+          },
+        });
+      } else {
+        console.log("validate karo");
+        toast.warning("Give proper Validation!!!", {
+          autoClose: 1000,
+        });
+      }
+    };
 
   // useEffect(()=>{
   //   console.log(selectedComponents);
@@ -211,8 +224,9 @@ const UIPlanning = () => {
   // });
 
   useEffect(() => {
-    if (Object.keys(completeFormDataContext).includes(currentCount.toString())) 
-    {
+    if (
+      Object.keys(completeFormDataContext).includes(currentCount.toString())
+    ) {
       //console.log('consoled');
       const filteredData = Object.values(
         completeFormDataContext?.[currentCount]
@@ -297,18 +311,18 @@ const UIPlanning = () => {
     console.log("final data for backend");
     console.log(combinedObject);
 
-    axios.post('http://localhost:8080/saveData',combinedObject,{
-      headers:{
-        'Content-Type':'application/json',
-      }
-    }) 
-    .then((response) => {
-      console.log('Data sent to the backend successfully:', response.data);
-      navigate('/');
-    })
-    .catch((error) => {
-      console.error('Error sending data to the backend:', error.message);
-    });
+    axios.post("http://localhost:8080/saveData", combinedObject, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("Data sent to the backend successfully:", response.data);
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Error sending data to the backend:", error.message);
+      });
 
     // navigate('/')
   };
@@ -460,19 +474,31 @@ const UIPlanning = () => {
                 variant="outlined"
                 startIcon={<DeleteIcon />}
                 color="error"
-                onClick={() => handleRemoveComponent(index,Component.props.uniqueId)}
+                onClick={() =>
+                  handleRemoveComponent(index, Component.props.uniqueId)
+                }
                 style={{ position: "absolute", top: 100, right: 0 }}
               >
                 Delete
               </Button>
             </div>
           ))}
-          
         </div>
         {/* <div className="rightbar">
           <h1>hello</h1>
         </div> */}
       </div>
+      <ToastContainer
+        position="bottom-left"
+        autoClose={false}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   );
 };

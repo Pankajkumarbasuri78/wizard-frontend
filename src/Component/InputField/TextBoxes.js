@@ -12,6 +12,9 @@ import "../../CSS/textboxes.css";
 import { WizardContext } from "../../Context/WizardContext";
 
 const TextBoxes = (props) => {
+  //state to hold errors and display
+  const [errors, setErrors] = useState({});
+
   //global state
   const {
     completeFormDataContext,
@@ -19,6 +22,8 @@ const TextBoxes = (props) => {
     currentCount,
     setId,
     id,
+    setIsValid,
+    isValid
   } = useContext(WizardContext);
 
   // useEffect(() => {
@@ -36,16 +41,52 @@ const TextBoxes = (props) => {
     //seq: globalSeq,
     Uid: props.uniqueId,
   });
-  
 
-  const validateQuestion = (value)=>{
-    if(!value || value.trim() === ""){
-      return "Question is Required"
-    }else if(value[0] !== value[0].toUpperCase()){
-      return "Question should start with an uppercase letter"
+  //validation Question
+  const validateTextForm = (e) => {
+    let textValid = true;
+    const newErrors = {};
+
+    if (!e.question || e.question.trim() === "") {
+      newErrors.question = "Question field can't be empty";
+      textValid = false;
+    } 
+    else if (!/^[a-zA-Z]/.test(e.question)) {
+      newErrors.question = "Qusetion should start with a letter";
+      textValid = false;
+    } 
+    else if (e.question[0] !== e.question[0].toUpperCase()) {
+      newErrors.question = "Question should start with uppercase character";
+      textValid = false;
+    } 
+    else if(/^\d/.test(e.question)){
+      newErrors.question = "Question shout not start with a number"
     }
-    return "";
-  }
+    else if (e.question.length < 10) {
+      newErrors.question = "Question must be at least of 10 character";
+      textValid = false;
+    }
+
+    setErrors(newErrors);
+    return textValid;
+  };
+
+  //validate Options
+  const validateOptionForm = (options) => {
+    let optionValid = true;
+    const newErrors = {};
+
+    options.forEach((option, i) => {
+      if (!option || option.trim() === "") {
+        newErrors[`option${i + 1}`] = `Option ${i + 1} can't be empty`;
+        optionValid = false;
+      }
+
+    });
+
+    setErrors((previousError) => ({ ...previousError, ...newErrors }));
+    return optionValid;
+  };
 
   const handleQuestionChange = (e) => {
     console.log("formmmmmmmmm", formData.Uid);
@@ -54,7 +95,9 @@ const TextBoxes = (props) => {
       ...formData,
       question: e.target.value,
     });
-    const errorMessage =validateQuestion(e.target.value);
+
+    //call validate
+    setIsValid(validateTextForm({ question: e.target.value }));
   };
 
   const handleOptionChange = (index, value) => {
@@ -65,10 +108,15 @@ const TextBoxes = (props) => {
       ...formData,
       options: updatedOptions,
     });
+
+    // console.log("option",updatedOptions);
+
+    //call validate
+    setIsValid(validateOptionForm(updatedOptions));
   };
 
   const addOption = () => {
-    if (formData.options.length < 4) {
+    if (formData.options.length < 4 && isValid) {
       setFormData({ ...formData, options: [...formData.options, ""] });
     }
   };
@@ -77,14 +125,31 @@ const TextBoxes = (props) => {
     const updatedOptions = [...formData.options];
     updatedOptions.splice(index, 1);
     setFormData({ ...formData, options: updatedOptions });
+
+    setCompleteFormDataContext((prevContext)=>{
+      const updatedContext = {...prevContext};
+      const currentPageData = updatedContext[currentCount];
+
+      const currentPageOptions = [{...currentPageData.options}];
+      console.log("currentPageOption",currentPageOptions);
+    })
   };
 
   const updateCompleteFormData = (uid, updatedData) => {
     setId(id + 1);
     console.log("id", id);
-    console.log("ccccc",completeFormDataContext,"insert",formData.page,"pre",uid,"--",updatedData);
+    console.log(
+      "ccccc",
+      completeFormDataContext,
+      "insert",
+      formData.page,
+      "pre",
+      uid,
+      "--",
+      updatedData
+    );
     // if(uid && updatedData){
-      
+
     setCompleteFormDataContext((prevContext) => ({
       ...prevContext,
       [formData.page]: {
@@ -155,9 +220,10 @@ const TextBoxes = (props) => {
             onChange={handleQuestionChange}
             margin="normal"
             variant="outlined"
+            required
             sx={{ mb: 2 }}
-            error={Boolean(validateQuestion(formData.question))}
-            helperText={validateQuestion(formData.question)}
+            error={Boolean(errors.question)}
+            helperText={errors.question}
           />
 
           {formData.options.map((option, index) => (
@@ -167,14 +233,23 @@ const TextBoxes = (props) => {
                 value={option}
                 onChange={(e) => handleOptionChange(index, e.target.value)}
                 fullWidth
+                required
                 variant="outlined"
                 sx={{ flex: 1, mr: 1 }}
+                error={Boolean[`option${index + 1}`]}
+                helperText={errors[`option${index + 1}`]}
+                FormHelperTextProps={{
+                  sx: {
+                    color: 'red' // Set the color to red for error messages
+                  }
+                }}
               />
               <IconButton onClick={() => removeOption(index)}>
                 <DeleteIcon />
               </IconButton>
             </div>
           ))}
+
           <Button
             variant="outlined"
             onClick={addOption}
