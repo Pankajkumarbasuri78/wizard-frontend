@@ -40,6 +40,7 @@ const TextBoxes = (props) => {
     options: Object.keys(props).includes("options") ? props.options : [],
     //seq: globalSeq,
     Uid: props.uniqueId,
+    answer:''
   });
 
   //validation Question

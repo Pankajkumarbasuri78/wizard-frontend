@@ -1,35 +1,48 @@
 
 import '../CSS/user_form.css'
 
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Button, Typography, FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { WizardContext } from '../Context/WizardContext';
 
 function PreviewForm() {
-  const { completeFormDataContext } = useContext(WizardContext);
+  const { completeFormDataContext,setCompleteFormDataContext } = useContext(WizardContext);
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState({});
 
   console.log("preview",completeFormDataContext);
 
-  const handleInputChange = (questionId, value) => {
-    setAnswers({ ...answers, [questionId]: value });
-  };
-  const handleOptionChange = (questionId, value) => {
-    setAnswers({ ...answers, [questionId]: value });
-    console.log("answer",answers);
-  };
+ 
 
+  const handleOptionChange = (questionId, value,page) => {
+    console.log("qid",questionId,"value---",value);
+
+    // setCompleteFormDataContext()
+    setCompleteFormDataContext((prevFormData) => {
+      console.log("completedata-",Object.values(prevFormData));
+      
+      const updatedFormData = { ...prevFormData};
+      console.log("page in-",updatedFormData[page][questionId].answer);
+      updatedFormData[page][questionId].answer = value;
+      return updatedFormData;
+    });
+  };
+ 
+  
   const handleSubmit = () => {
     navigate(`/submitted`);
   };
+  
 
   const handleBack = () => {
     navigate('/ui');
   };
-  const renderQuestion = (questionId, questionData) => {
+  const renderQuestion = (questionId, questionData,page) => {
+    if (!questionData || !Array.isArray(questionData.options)) {
+      return null;
+    }
     const { question, options } = questionData;
+    console.log("question and options -",question,options);
 
     return (
       <div key={questionId}>
@@ -38,10 +51,10 @@ function PreviewForm() {
         </Typography>
         <FormControl component="fieldset">
           <RadioGroup
-            aria-label={`question-${questionId}`}
-            name={`question-${questionId}`}
-            value={answers[questionId] || ''}
-            onChange={(e) => handleOptionChange(questionId, e.target.value)}
+            // aria-label={`question-${questionId}`}
+            // name={`question-${questionId}`}
+            value={completeFormDataContext[page][questionId]?.answer || ''}
+            onChange={(e) => handleOptionChange(questionId, e.target.value,page)}
           >
             {options.map((option, index) => (
               <FormControlLabel
@@ -105,8 +118,8 @@ function PreviewForm() {
   //   }
   //   return null;
   // };
-console.log("1",Object.keys(completeFormDataContext));
-console.log("2",Object.keys(completeFormDataContext[1]));
+// console.log("1",Object.keys(completeFormDataContext));
+// console.log("2",Object.keys(completeFormDataContext[1]));
   return (
     <div className="submit">
       <div className="user_form">
@@ -116,9 +129,9 @@ console.log("2",Object.keys(completeFormDataContext[1]));
               {`page-${page}`}
               {Object.keys(completeFormDataContext[page]).map((questionId) => (
                 <div key={`question-${questionId}`}>
-                  {console.log("questionid-",questionId,"page-",page)}
-                  {console.log(completeFormDataContext[page][questionId])}
-                  {renderQuestion(questionId, completeFormDataContext[page][questionId])}
+                  {console.log("questionid-",questionId,"==page-",page)}
+                  {console.log("extra",completeFormDataContext[page][questionId])}
+                  {renderQuestion(questionId, completeFormDataContext[page][questionId],page)}
                 </div>
               ))}
             </div>
