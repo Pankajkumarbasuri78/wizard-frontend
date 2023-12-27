@@ -317,7 +317,7 @@ const UIPlanning = () => {
         },
       })
       .then((response) => {
-        console.log("Data sent to the backend successfully:", response.data);
+                console.log("Data sent to the backend successfully:", response.data);
         navigate("/");
       })
       .catch((error) => {

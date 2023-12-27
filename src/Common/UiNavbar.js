@@ -57,7 +57,6 @@ const UiNavbar = () => {
   };
 
   const handlePreview = () => {
-    //navigate('/preview',{ state: { completeFormData: completeFormData } })
     navigate("/preview");
   };
 
