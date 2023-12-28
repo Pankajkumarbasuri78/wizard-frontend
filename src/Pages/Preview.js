@@ -5,13 +5,18 @@ import React, { useContext } from 'react';
 import { Button, Typography, FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { WizardContext } from '../Context/WizardContext';
+import {  useParams } from 'react-router-dom';
+import axios from "axios";
 
-function PreviewForm() {
-  const { completeFormDataContext,setCompleteFormDataContext } = useContext(WizardContext);
+
+const PreviewForm = () =>{
+
+  const {userId} = useParams();
+  const { wizardData,completeFormDataContext,setCompleteFormDataContext } = useContext(WizardContext);
   const navigate = useNavigate();
 
   console.log("preview",completeFormDataContext);
-
+console.log("userId",userId);
  
 
   const handleOptionChange = (questionId, value,page) => {
@@ -30,7 +35,23 @@ function PreviewForm() {
  
   
   const handleSubmit = () => {
-    navigate(`/submitted`);
+    const combinedObject = { ...wizardData, completeFormDataContext };
+    console.log("final data for backend with answer",combinedObject);
+    
+    axios.post(`http://localhost:8080/saveData/${userId}`,combinedObject, {
+      headers: {
+        "Content-Type":"application/json",
+      }
+    })
+    .then((response)=>{
+      console.log("Data sent to the backend successfully with answer",response.data);
+      navigate('/')
+    })
+    .catch((error)=>{
+      console.log("Error sending dataa to the backend", error.message);
+
+    })
+    // navigate(`/submitted`);
   };
   
 
@@ -146,7 +167,7 @@ function PreviewForm() {
             </Button>
           </div>
 
-          <div className="user_footer">Google Forms</div>
+          {/* <div className="user_footer">Google Forms</div> */}
         </div>
       </div>
     </div>

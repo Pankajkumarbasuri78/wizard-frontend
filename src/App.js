@@ -33,6 +33,8 @@ const App = () => {
         <Route path="/dropdown" element={<Dropdown/>}/> */}
         <Route path="/displayPage" element={<DisplayPage/>}/>
         <Route path="/preview" element={<Preview/>}/>
+        <Route path="/preview/:userId" element={<Preview />} />
+
       </Routes>
       </WizardContextProvider>
     </>

@@ -42,7 +42,7 @@ const CardComp = ({title}) => {
         </Box>
       </CardContent>
       <CardActions sx={{display:'flex',justifyContent:'center',alignItems:'center'}}>
-        <Button size="large" onClick={()=>handleData(7)}>{title} </Button>
+        <Button size="large" onClick={()=>handleData(4)}>{title} </Button>
       </CardActions>
     </Card>
   )

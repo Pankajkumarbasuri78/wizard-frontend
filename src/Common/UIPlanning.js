@@ -318,7 +318,8 @@ const UIPlanning = () => {
       })
       .then((response) => {
                 console.log("Data sent to the backend successfully:", response.data);
-        navigate("/");
+        // navigate("/");
+        alert("Data is send to backend, you can preview now")
       })
       .catch((error) => {
         console.error("Error sending data to the backend:", error.message);
