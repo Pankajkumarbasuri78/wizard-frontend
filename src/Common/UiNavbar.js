@@ -57,7 +57,7 @@ const UiNavbar = () => {
   };
 
   const handlePreview = () => {
-    navigate(`/preview/${3}`);
+    navigate(`/preview/${5}`);
   };
 
   return (

@@ -318,6 +318,9 @@ const UIPlanning = () => {
       })
       .then((response) => {
                 console.log("Data sent to the backend successfully:", response.data);
+                const finalData = response.data;
+                console.log("idddddddddddd",finalData.id);
+                navigate(`/preview/${finalData.id}`)
         // navigate("/");
         alert("Data is send to backend, you can preview now")
       })

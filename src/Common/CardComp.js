@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom'
 
-const CardComp = ({title}) => {
+const CardComp = ({title,id}) => {
 
   const navigate = useNavigate();
 
@@ -42,7 +42,7 @@ const CardComp = ({title}) => {
         </Box>
       </CardContent>
       <CardActions sx={{display:'flex',justifyContent:'center',alignItems:'center'}}>
-        <Button size="large" onClick={()=>handleData(4)}>{title} </Button>
+        <Button size="large" onClick={()=>handleData(id)}>{title} </Button>
       </CardActions>
     </Card>
   )
