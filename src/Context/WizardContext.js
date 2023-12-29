@@ -10,6 +10,7 @@ const WizardContextProvider = ({ children }) => {
     totalSteps: "",
   });
 
+  //UId
   const [id,setId] = useState(1);
 
   // const [completeFormDataContext,setCompleteFormDataContext] = useState({
@@ -60,6 +61,8 @@ const WizardContextProvider = ({ children }) => {
   const [currentCount, setCurrentCount] = useState(1);
 
   const [isValid,setIsValid] = useState(false);
+
+  // const userId
 
   
 

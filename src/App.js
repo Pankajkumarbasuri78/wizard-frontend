@@ -23,6 +23,7 @@ const App = () => {
         <Route path="/" element={<HomePage/>}/>
         <Route path="/wizard-creation" element={<WizardCreation/>}/>
         <Route path="/ui" element={<UIPlanning/>}/>
+        <Route path="/ui/:userId" element={<UIPlanning/>}/>
 
 
         
@@ -32,6 +33,7 @@ const App = () => {
         <Route path="/MultiSelect" element={<MultiSelectOption/>}/>
         <Route path="/dropdown" element={<Dropdown/>}/> */}
         <Route path="/displayPage" element={<DisplayPage/>}/>
+        <Route path="/displayPage/:userId" element={<DisplayPage/>}/>
         <Route path="/preview" element={<Preview/>}/>
         <Route path="/preview/:userId" element={<Preview />} />
 

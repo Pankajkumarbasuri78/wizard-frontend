@@ -6,7 +6,7 @@ import MultiSelectOption from "../Component/InputField/MultiSelectOption";
 import RadioButton from "../Component/InputField/RadioButton";
 import Button from "@mui/material/Button";
 import "../CSS/UIPlanning.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 
 import { WizardContext } from "../Context/WizardContext";
 import TextArea from "../Component/InputField/TextAreas";
@@ -19,12 +19,12 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 
 const UIPlanning = () => {
+  const {userId} = useParams();
+  
   const navigate = useNavigate();
 
   const {
     wizardData,
-    submitAll,
-    setSubmitAll,
     selectedComponents,
     setSelectedComponents,
     setPage,
@@ -32,11 +32,7 @@ const UIPlanning = () => {
     currentCount,
     setCurrentCount,
     id,
-    setId,
-    isValid,
-    setIsValid,
-    userId,
-    setUserId
+    isValid
   } = useContext(WizardContext);
 
   //console.log("context se hai");
@@ -58,13 +54,12 @@ const UIPlanning = () => {
   const handleOptionClick = (option) => {
     switch (option) {
       case "TextBoxes":
-        console.log("SSSSSS", selectedComponents);
+        // console.log("SSSSSS", selectedComponents);
         setSelectedComponents([
           ...selectedComponents,
           <TextBoxes
             key={selectedComponents.length}
             uniqueId={id}
-            //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
           />,
         ]);
 
@@ -133,13 +128,15 @@ const UIPlanning = () => {
   };
 
   const handleRemoveComponent = (index, Uid) => {
-    console.log("1111111111111111", index);
+    // console.log("1111111111111111", index);
+    
     const updatedComponents = [...selectedComponents];
     updatedComponents.splice(index, 1);
     setSelectedComponents(updatedComponents);
 
     console.log("uniquiiDDDD", Uid);
 
+    //remove data from completeFormDataContext
     setCompleteFormDataContext((prevContext) => {
       const updatedContext = { ...prevContext };
       const currentPageData = updatedContext[currentCount];
@@ -153,6 +150,7 @@ const UIPlanning = () => {
       return updatedContext;
     });
   };
+
   const handleRemoveAllComponent = () => {
     if (selectedComponents.length > 0) {
       const updatedComponents = [...selectedComponents];
@@ -163,34 +161,34 @@ const UIPlanning = () => {
     }
   };
 
-  //passing data by navigate and location
-  const handlePreview = () => {
-    //navigate('/preview',{ state: { completeFormData: completeFormData } })
-    navigate("/preview");
-  };
+  // //passing data by navigate and location
+  // const handlePreview = () => {
+  //   //navigate('/preview',{ state: { completeFormData: completeFormData } })
+  //   navigate("/preview");
+  // };
 
-  //console.log("Form State:", completeFormDataContext);
+  // //console.log("Form State:", completeFormDataContext);
 
-  const handleNextPage = () => {
-    if (currentCount == wizardData.totalSteps) {
-      alert("over");
-    } else {
-      setPage(page + 1);
-      setCurrentCount(currentCount + 1);
-      console.log(page);
-      handleRemoveAllComponent();
-    }
-  };
+  // const handleNextPage = () => {
+  //   if (currentCount == wizardData.totalSteps) {
+  //     alert("over");
+  //   } else {
+  //     setPage(page + 1);
+  //     setCurrentCount(currentCount + 1);
+  //     console.log(page);
+  //     handleRemoveAllComponent();
+  //   }
+  // };
 
-  const handlePrevPage = () => {
-    console.log("open page1 edit");
-    if (currentCount > 1) {
-      setCurrentCount(currentCount - 1);
-      handleRemoveAllComponent();
-    } else {
-      alert("negative");
-    }
-  };
+  // const handlePrevPage = () => {
+  //   console.log("open page1 edit");
+  //   if (currentCount > 1) {
+  //     setCurrentCount(currentCount - 1);
+  //     handleRemoveAllComponent();
+  //   } else {
+  //     alert("negative");
+  //   }
+  // };
 
     const handleSubmitAll = () => {
       if (isValid) {
@@ -224,13 +222,12 @@ const UIPlanning = () => {
   // });
 
   useEffect(() => {
+    // console.log("aaaaaayyyyyyyaaaaaa");
     if (
       Object.keys(completeFormDataContext).includes(currentCount.toString())
     ) {
       //console.log('consoled');
-      const filteredData = Object.values(
-        completeFormDataContext?.[currentCount]
-      )?.filter((e) => {
+      const filteredData = Object.values(completeFormDataContext?.[currentCount])?.filter((e) => {
         return e.page === currentCount;
       });
       console.log("this is filtered data", filteredData);
@@ -245,7 +242,6 @@ const UIPlanning = () => {
                 question={filterData.question}
                 options={filterData.options}
 
-                //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
               />
             );
 
@@ -257,7 +253,6 @@ const UIPlanning = () => {
                 question={filterData.question}
                 options={filterData.options}
 
-                //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
               />
             );
 
@@ -268,7 +263,6 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
-                //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
               />
             );
 
@@ -279,7 +273,6 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
-                //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
               />
             );
 
@@ -290,7 +283,6 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 textDescription={filterData.textDescription}
-                //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
               />
             );
 
@@ -300,7 +292,7 @@ const UIPlanning = () => {
       });
       //console.log('updatedComponent: ', updateSelectedComponents)
       setSelectedComponents([...updateSelectedComponents]);
-      // }
+      
     } else {
       console.log("page not found");
     }
@@ -310,23 +302,43 @@ const UIPlanning = () => {
     const combinedObject = { ...wizardData, completeFormDataContext };
     console.log("final data for backend");
     console.log(combinedObject);
+    
+      if(userId){
+        axios.post(`http://localhost:8080/saveData/${userId}`,combinedObject,{
+          headers: {
+            "Content-Type":"application/json",
+          }
+        })
+        .then((res)=>{
+          console.log(`Data is sent to the backend with id ${userId} `,res.data);
+          const finalData = res.data;
+          console.log("USERRRidddddddddddd",finalData.id);
+          navigate(`/preview/${userId}`)
+        })
+        .catch((error)=>{
+          console.error("Error sending data to the backend:", error.message);
+        })
+      }
+    
 
-    axios.post("http://localhost:8080/saveData", combinedObject, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-                console.log("Data sent to the backend successfully:", response.data);
-                const finalData = response.data;
-                console.log("idddddddddddd",finalData.id);
-                navigate(`/preview/${finalData.id}`)
-        // navigate("/");
-        alert("Data is send to backend, you can preview now")
-      })
-      .catch((error) => {
-        console.error("Error sending data to the backend:", error.message);
-      });
+      else{
+          axios.post("http://localhost:8080/saveData", combinedObject, {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+            .then((response) => {
+                      console.log("Data sent to the backend successfully:", response.data);
+                      const finalData = response.data;
+                      console.log("idddddddddddd",finalData.id);
+                      navigate(`/preview/${finalData.id}`)
+              // navigate("/");
+              alert("Data is send to backend, you can preview now")
+            })
+            .catch((error) => {
+              console.error("Error sending data to the backend:", error.message);
+            });
+    }
 
     // navigate('/')
   };
@@ -337,16 +349,10 @@ const UIPlanning = () => {
         <UiNavbar />
       </div>
       <div style={{ display: "flex" }}>
-        <div
-          className="uiContainer"
-          style={{ position: "sticky", top: 0, gap: 20 }}
-        >
+        <div className="uiContainer" style={{ position: "sticky", top: 0, gap: 20 }}>
           {/* <h4>Step {currentCount}</h4> */}
           <h2 style={{ padding: "10px" }}>Select a Form Element</h2>
-          <div
-            className="UiWrapper"
-            style={{ paddingLeft: "40px", gap: "10px" }}
-          >
+          <div className="UiWrapper" style={{ paddingLeft: "40px", gap: "10px" }}>
             <Button
               variant="outlined"
               color="success"
@@ -397,31 +403,6 @@ const UIPlanning = () => {
               Text Area
             </Button>
 
-            {/* <Button
-              variant="outlined"
-              color="success"
-              onClick={handleNextPage}
-              disabled={currentCount == wizardData.totalSteps}
-            >
-              Next
-            </Button>
-            <Button
-              variant="outlined"
-              color="success"
-              onClick={handlePrevPage}
-              disabled={currentCount == 1}
-            >
-              Prev
-            </Button> */}
-            {/* <Button
-              variant="outlined"
-              color="success"
-              onClick={handlePreview}
-              disabled={currentCount < wizardData.totalSteps}
-            >
-              Preview
-            </Button> */}
-
             <Button
               variant="contained"
               color="success"
@@ -438,59 +419,37 @@ const UIPlanning = () => {
               Final Submit
             </Button>
           </div>
-          {/* //getData={getAccordionDetailsUtilityClass()} */}
+          
         </div>
 
         <div className="renderedContainer">
-          {/* <StepTracker
-            totalSteps={wizardData.totalSteps}
-            currentStep={currentCount}
-          /> */}
-          <h1
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: "30px",
-            }}
-          >
-            {wizardData.title}
-          </h1>
-          {console.log("selectedComponent:", selectedComponents)}
-          {/* {console.log("typeof ", typeof(selectedComponents))} */}
+            
+            <h1 style={{ display: "flex",justifyContent: "center",marginBottom: "30px"}}>
+              {wizardData.title}
+            </h1>
 
-          {selectedComponents.map((Component, index) => (
-            <div
-              key={index}
-              style={{ marginBottom: "20px", position: "relative" }}
-            >
-              {/* <h1>{index}</h1> */}
-              {{ ...Component, props: { ...Component.props, index } }}
-              {/* {console.log("comccccccc",Component)} */}
-              {/* <Button
-                variant="contained"
-                color="error"
-                onClick={() => handleRemoveComponent(index)}
-                style={{ position: "absolute", top: 100, right: 0 }}
-              >
-                Remove
-              </Button> */}
-              <Button
-                variant="outlined"
-                startIcon={<DeleteIcon />}
-                color="error"
-                onClick={() =>
-                  handleRemoveComponent(index, Component.props.uniqueId)
-                }
-                style={{ position: "absolute", top: 100, right: 0 }}
-              >
-                Delete
-              </Button>
-            </div>
-          ))}
+            {console.log("selectedComponent:", selectedComponents)}
+            {/* {console.log("typeof ", typeof(selectedComponents))} */}
+
+            {selectedComponents.map((Component, index) => (
+              <div key={index} style={{ marginBottom: "20px", position: "relative" }}>
+                {/* <h1>{index}</h1> */}
+                {{ ...Component, props: { ...Component.props, index } }}
+                {/* {console.log("comccccccc",Component)} */}
+                
+                <Button
+                  variant="outlined"
+                  startIcon={<DeleteIcon />}
+                  color="error"
+                  onClick={() => handleRemoveComponent(index, Component.props.uniqueId)}
+                  style={{ position: "absolute", top: 100, right: 0 }}
+                >
+                  Delete
+                </Button>
+              </div>
+            ))}
         </div>
-        {/* <div className="rightbar">
-          <h1>hello</h1>
-        </div> */}
+        
       </div>
       <ToastContainer
         position="bottom-left"

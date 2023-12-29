@@ -1,11 +1,8 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-//import Typography from '@mui/material/Typography';
-//import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
@@ -20,12 +17,12 @@ const Navbar = () => {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <MenuIcon />
+            {/* <MenuIcon /> */}
+            <img src='https://www.supplychainquarterly.com/ext/resources/images/industry_pressroom/uploaded/1_1537806109.jpg?t=1584337397&width=1080' alt='logo' height={30} width={40} />
           </IconButton>
           <Link to={'/'} style={{textDecoration:'none',color:'white'}}>
             WIZARD
           </Link>
-          {/* <Button color="inherit">Login</Button> */}
         </Toolbar>
       </AppBar>
     </Box>

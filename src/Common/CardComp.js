@@ -15,17 +15,20 @@ const CardComp = ({title,id}) => {
 
   const navigate = useNavigate();
 
-  const handleData = (id) => {
-    // axios.get('http://localhost:8080/getData')
-    axios.get(`http://localhost:8080/getData/${id}`)
-    .then((response) => {
-      const dataById = JSON.parse(response.data.jsonData);
+  const handleData = async (id) => {
+    try {
+      const res = await axios.get(`http://localhost:8080/getData/${id}`);
+      const dataById = JSON.parse(res.data.jsonData);
+
       console.log(`Data retrieved for ID ${id}:`, dataById);
-      navigate('/displayPage',{state:{dataById}})
-    })
-    .catch((error) => {
+
+      //navigate
+      navigate(`/displayPage/${id}`,{state:{dataById}});
+
+    } catch (error) {
       console.error(`Error fetching data for ID ${id} from the backend:`, error.message);
-    });
+    }
+    
   };
 
   return (
