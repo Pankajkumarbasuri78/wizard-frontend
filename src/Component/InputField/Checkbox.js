@@ -91,10 +91,29 @@ const CheckboxComponent = (props) => {
     }
   };
 
-  const removeOption = (index) => {
+  const removeOption = (index,uid) => {
     const updatedOptions = [...formData.options];
     updatedOptions.splice(index, 1);
     setFormData({ ...formData, options: updatedOptions });
+
+    setCompleteFormDataContext((prevContext) => {
+      const updatedContext = {...prevContext};
+      const currentPageData = {...updatedContext[currentCount]};
+
+      if(currentPageData && currentPageData[uid]) {
+        const currentPageOptions = [...currentPageData[uid].options];
+
+        if(currentPageOptions) {
+          currentPageOptions.splice(index,1);
+          currentPageData[uid].options = currentPageOptions;
+          updatedContext[currentCount] = currentPageData;
+
+          return updatedContext;
+        }
+      }
+
+      return prevContext;
+    })
   };
 
   const updateCompleteFormData = (uid, updatedData) => {
@@ -155,7 +174,7 @@ useEffect(()=>{
                 error={Boolean[`option${index + 1}`]}
                 helperText={errors[`option${index + 1}`]}
               />
-              <IconButton onClick={() => removeOption(index)}>
+              <IconButton onClick={() => removeOption(index,formData.Uid)}>
                 <DeleteIcon />
               </IconButton>
             </div>

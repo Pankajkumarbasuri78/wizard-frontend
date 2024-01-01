@@ -122,19 +122,38 @@ const TextBoxes = (props) => {
     }
   };
 
-  const removeOption = (index) => {
+  const removeOption = (index, uid) => {
     const updatedOptions = [...formData.options];
     updatedOptions.splice(index, 1);
     setFormData({ ...formData, options: updatedOptions });
+  
+    setCompleteFormDataContext((prevContext) => {
+      const updatedContext = { ...prevContext };
+      const currentPageData = { ...updatedContext[currentCount] };
+  
+      
+      if (currentPageData && currentPageData[uid]) {
+        const currentPageOptions = [...currentPageData[uid].options];
+        
+        console.log("remove option",currentPageData[uid]);
+        console.log("index",index,"uid",uid);
 
-    setCompleteFormDataContext((prevContext)=>{
-      const updatedContext = {...prevContext};
-      const currentPageData = updatedContext[currentCount];
+        
+        if (currentPageOptions) {
+          currentPageOptions.splice(index, 1);
+          currentPageData[uid].options = currentPageOptions;
+          updatedContext[currentCount] = currentPageData;
 
-      const currentPageOptions = [{...currentPageData.options}];
-      console.log("currentPageOption",currentPageOptions);
-    })
+          // Update the completeFormDataContext
+          return updatedContext;
+        }
+      }
+      
+      // Return the unchanged context
+      return prevContext;
+    });
   };
+  
 
   const updateCompleteFormData = (uid, updatedData) => {
     setId(id + 1);
@@ -245,7 +264,7 @@ const TextBoxes = (props) => {
                   }
                 }}
               />
-              <IconButton onClick={() => removeOption(index)}>
+              <IconButton onClick={() => removeOption(index,formData.Uid)}>
                 <DeleteIcon />
               </IconButton>
             </div>
