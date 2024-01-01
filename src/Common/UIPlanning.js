@@ -93,7 +93,7 @@ const UIPlanning = () => {
           ...selectedComponents,
           <MultiSelectOption
             key={selectedComponents.length}
-            uniqueId={selectedComponents.length}
+            uniqueId={id}
             //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
           />,
         ]);
@@ -104,7 +104,7 @@ const UIPlanning = () => {
           ...selectedComponents,
           <RadioButton
             key={selectedComponents.length}
-            uniqueId={selectedComponents.length}
+            uniqueId={id}
             //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
           />,
         ]);
@@ -115,7 +115,7 @@ const UIPlanning = () => {
           ...selectedComponents,
           <TextArea
             key={selectedComponents.length}
-            uniqueId={selectedComponents.length}
+            uniqueId={id}
             //onRemove = {()=>handleRemoveComponent(selectedComponents.length)}
           />,
         ]);

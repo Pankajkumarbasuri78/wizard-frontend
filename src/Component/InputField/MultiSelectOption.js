@@ -14,7 +14,8 @@ const MultiSelectOption = (props) => {
     type:'mcq',
     question: Object.keys(props).includes('question')?props.question:'',
     options: Object.keys(props).includes('options')?props.options:[],
-    Uid: props.uniqueId
+    Uid: props.uniqueId,
+    answer:''
   });
 
   const handleQuestionChange = (e) => {
@@ -41,10 +42,36 @@ const MultiSelectOption = (props) => {
     }
   };
 
-  const removeOption = (index) => {
+  const removeOption = (index, uid) => {
     const updatedOptions = [...formData.options];
     updatedOptions.splice(index, 1);
     setFormData({ ...formData, options: updatedOptions });
+  
+    setCompleteFormDataContext((prevContext) => {
+      const updatedContext = { ...prevContext };
+      const currentPageData = { ...updatedContext[currentCount] };
+  
+      
+      if (currentPageData && currentPageData[uid]) {
+        const currentPageOptions = [...currentPageData[uid].options];
+        
+        console.log("remove option",currentPageData[uid]);
+        console.log("index",index,"uid",uid);
+
+        
+        if (currentPageOptions) {
+          currentPageOptions.splice(index, 1);
+          currentPageData[uid].options = currentPageOptions;
+          updatedContext[currentCount] = currentPageData;
+
+          // Update the completeFormDataContext
+          return updatedContext;
+        }
+      }
+      
+      // Return the unchanged context
+      return prevContext;
+    });
   };
 
   const updateCompleteFormData = (uid, updatedData) => {
@@ -66,33 +93,7 @@ const MultiSelectOption = (props) => {
     updateCompleteFormData(formData.Uid, formData);
   }, []);
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-
-  //   setGlobalSeq(globalSeq+1);
-    
-  //   console.log('mcq', { formData });
-
-  //   const textBoxUpdate = structuredClone(completeFormDataContext)
-  //   textBoxUpdate.multiSelectOptions.push(formData)
-  //   console.log("texboxcontext");
-  //   console.log(textBoxUpdate);
-
-  //   setCompleteFormDataContext(textBoxUpdate);
-
-  //   onRemove()
-  //   setFormData({
-  //     question: '',
-  //     options: [],
-  //   });
-  // };
-
-  // useEffect(()=>{
-  //   setCompleteFormDataContext((prevContext)=>({...prevContext,[formData.page]:{
-  //     ...prevContext[formData.page],[formData.Uid]:formData
-  //   }}))
-  //   console.log(completeFormDataContext);
-  // },[formData])
+  
 
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', padding: '20px', backgroundColor: '#F3F5F0', borderRadius: '8px', boxShadow: '0px 3px 6px #00000029' }}>
@@ -126,7 +127,7 @@ const MultiSelectOption = (props) => {
                 variant="outlined"
                 sx={{ flex: 1, mr: 1 }}
               />
-              <IconButton onClick={() => removeOption(index)}>
+              <IconButton onClick={() => removeOption(index,formData.Uid)}>
                 <DeleteIcon />
               </IconButton>
             </div>
