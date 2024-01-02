@@ -303,6 +303,7 @@ const UIPlanning = () => {
     console.log("final data for backend");
     console.log(combinedObject);
     
+    //old data
       if(userId){
         axios.post(`http://localhost:8080/saveData/${userId}`,combinedObject,{
           headers: {
@@ -321,6 +322,7 @@ const UIPlanning = () => {
       }
     
 
+      //new data
       else{
           axios.post("http://localhost:8080/saveData", combinedObject, {
               headers: {

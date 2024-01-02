@@ -3,6 +3,7 @@ import { useLocation, useNavigate,useParams } from "react-router-dom";
 import Button from "@mui/material/Button";
 import { WizardContext } from "../Context/WizardContext";
 
+
 const DisplayPage = () => {
   const {userId} = useParams();
   
@@ -70,6 +71,7 @@ const DisplayPage = () => {
             Back
           </Button>
         </div>
+        
         {/* {renderDisplay()} */}
         {/* <br />
         <pre>{JSON.stringify(initialData, null, 2)}</pre>

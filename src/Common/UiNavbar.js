@@ -6,13 +6,15 @@ import Toolbar from "@mui/material/Toolbar";
 //import Button from '@mui/material/Button';
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link,useNavigate } from "react-router-dom";
+import { Link,useNavigate,useParams } from "react-router-dom";
 import StepTracker from "../Component/StepTracker";
 import { WizardContext } from "../Context/WizardContext";
 import Button from "@mui/material/Button";
+import axios from "axios";
 
 const UiNavbar = () => {
 
+  const {userId} = useParams();
   const navigate = useNavigate();
 
   const {
@@ -23,6 +25,7 @@ const UiNavbar = () => {
     page,
     selectedComponents,
     setSelectedComponents,
+    completeFormDataContext
   } = useContext(WizardContext);
 
   const handleRemoveAllComponent = () => {
@@ -56,8 +59,54 @@ const UiNavbar = () => {
     }
   };
 
+  // const handlePreview = () => {
+  //   navigate(`/preview/${5}`);
+  // };
   const handlePreview = () => {
-    navigate(`/preview/${5}`);
+    const combinedObject = { ...wizardData, completeFormDataContext };
+    console.log("final data for backend");
+    console.log(combinedObject);
+    
+    //old data
+      if(userId){
+        axios.post(`http://localhost:8080/saveData/${userId}`,combinedObject,{
+          headers: {
+            "Content-Type":"application/json",
+          }
+        })
+        .then((res)=>{
+          console.log(`Data is sent to the backend with id ${userId} `,res.data);
+          const finalData = res.data;
+          console.log("USERRRidddddddddddd",finalData.id);
+          navigate(`/preview/${userId}`)
+        })
+        .catch((error)=>{
+          console.error("Error sending data to the backend:", error.message);
+        })
+      }
+    
+
+      //new data
+      else{
+          axios.post("http://localhost:8080/saveData", combinedObject, {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+            .then((response) => {
+                      console.log("Data sent to the backend successfully:", response.data);
+                      const finalData = response.data;
+                      console.log("idddddddddddd",finalData.id);
+                      navigate(`/preview/${finalData.id}`)
+              // navigate("/");
+              alert("Data is send to backend, you can preview now")
+            })
+            .catch((error) => {
+              console.error("Error sending data to the backend:", error.message);
+            });
+    }
+
+    // navigate('/')
   };
 
   return (
