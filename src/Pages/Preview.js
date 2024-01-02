@@ -1,7 +1,7 @@
 
 import '../CSS/user_form.css';
 import React, { useContext } from 'react';
-import { Button, Typography, FormControl, Select, MenuItem, InputLabel } from '@mui/material';
+import { Button, Typography, FormControl, Select, MenuItem, InputLabel,Paper  } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { WizardContext } from '../Context/WizardContext';
 import { useParams } from 'react-router-dom';
@@ -48,6 +48,7 @@ const PreviewForm = () => {
     const { question, options } = questionData;
 
     return (
+      
       <div key={questionId}>
         <Typography variant="body1" gutterBottom>
           {question}
@@ -73,9 +74,14 @@ const PreviewForm = () => {
   };
 
   return (
+    
     <div className="submit">
       <div className="user_form">
+      
         <div className="user_form_section">
+        <Paper elevation={10}>
+          <div style={{display:'flex',justifyContent:'center',alignItems:'center',marginTop:20}}>{wizardData.title}</div>
+        
           {Object.keys(completeFormDataContext).map((page) => {
             const questions = Object.keys(completeFormDataContext[page]);
             if (questions.length === 0) {
@@ -92,6 +98,7 @@ const PreviewForm = () => {
               </div>
             );
           })}
+          </Paper>
 
           <div className="user_form_submit">
             <Button variant="contained" color="primary" onClick={handleSubmit}>
@@ -102,8 +109,10 @@ const PreviewForm = () => {
             </Button>
           </div>
         </div>
+        
       </div>
     </div>
+    
   );
 };
 
