@@ -3,8 +3,11 @@ import { Typography, TextField, Box } from '@mui/material';
 import { WizardContext } from '../../Context/WizardContext';
 
 const TextArea = (props) => {
+
+  const [errors,setErrors] = useState({});
+
   // Global state,
-  const { completeFormDataContext,setId,id, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
+  const { completeFormDataContext,setId,setIsValid,id, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
 
   // Local state
   const [formData, setFormData] = useState({
@@ -19,21 +22,38 @@ const TextArea = (props) => {
     
   });
 
+  //validate question
+  const validateTextAreaForm = (e) =>{
+
+    let textValid = true;
+    const newErrors = {};
+
+    if(!e.question || e.question.trim() === ""){
+      newErrors.question = "Question field can't be empty";
+      textValid = false;
+    }else if (!/^[a-zA-Z]/.test(e.question)){
+      newErrors.question = "Qusetion should start with a letter";
+      textValid = false;
+    }else if(e.question.length < 10){
+      newErrors.question = "Question must be at least of 10 character";
+      textValid =false;
+    }
+
+
+    setErrors(newErrors);
+    return textValid;
+  }
+
   const handleQuestionChange = (e) => {
     setFormData({ ...formData, question: e.target.value });
     updateCompleteFormData(formData.Uid, {
       ...formData,
       question: e.target.value,
     });
-  };
 
-  // const handleDescriptionChange = (e) => {
-  //   setFormData({ ...formData, textDescription: e.target.value });
-  //   updateCompleteFormData(formData.Uid, {
-  //     ...formData,
-  //     textDescription: e.target.value,
-  //   });
-  // };
+    //validate question
+    setIsValid(validateTextAreaForm({question : e.target.value}));
+  };
 
   const updateCompleteFormData = (uid, updatedData) => {
     setId(id + 1);
@@ -98,21 +118,9 @@ const TextArea = (props) => {
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
+            error={Boolean(errors.question)}
+            helperText={errors.question}
           />
-          {/* <TextField
-            label="Text Description"
-            fullWidth
-            value={formData.textDescription}
-            onChange={handleDescriptionChange}
-            margin="normal"
-            variant="outlined"
-            multiline
-            rows={4}
-            sx={{ mb: 2 }}
-          /> */}
-          {/* <Button variant="contained" color="primary" type="submit">
-            Submit
-          </Button> */}
         </div>
       </form>
     </Box>

@@ -286,14 +286,21 @@
 // };
 
 // export default TextBoxes;
+
+
 import React, { useState, useContext, useEffect } from 'react';
 import { Typography, TextField, Box } from '@mui/material';
 import { WizardContext } from '../../Context/WizardContext';
 
 const TextBoxes = (props) => {
+
+  const [errors,setErrors] = useState({});
+
   // Global state,
-  const { completeFormDataContext,setId,id, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
+  const { setIsValid,completeFormDataContext,setId,id, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
+
 console.log("textBox props",props);
+
   // Local state
   const [formData, setFormData] = useState({
     page:currentCount,
@@ -306,12 +313,37 @@ console.log("textBox props",props);
     
   });
 
+  //validate question
+  const validateTextboxForm = (e) =>{
+
+    let textValid = true;
+    const newErrors = {};
+
+    if(!e.question || e.question.trim() === ""){
+      newErrors.question = "Question field can't be empty";
+      textValid = false;
+    }else if (!/^[a-zA-Z]/.test(e.question)){
+      newErrors.question = "Qusetion should start with a letter";
+      textValid = false;
+    }else if(e.question.length < 10){
+      newErrors.question = "Question must be at least of 10 character";
+      textValid =false;
+    }
+
+
+    setErrors(newErrors);
+    return textValid;
+  }
+
   const handleQuestionChange = (e) => {
     setFormData({ ...formData, question: e.target.value });
     updateCompleteFormData(formData.Uid, {
       ...formData,
       question: e.target.value,
     });
+
+    //validate question
+    setIsValid(validateTextboxForm({question : e.target.value}));
   };
 
   // const handleDescriptionChange = (e) => {
@@ -341,24 +373,6 @@ console.log("textBox props",props);
     updateCompleteFormData(formData.Uid, formData);
   }, []);
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   setGlobalSeq(globalSeq + 1);
-
-  //   console.log('From TextBoxes comp. :', formData);
-
-  //   // Clone and update context data
-  //   const textAreaUpdate = { ...completeFormDataContext };
-  //   textAreaUpdate.textArea.push(formData);
-
-  //   setCompleteFormDataContext(textAreaUpdate);
-  //   onRemove();
-
-  //   setFormData({
-  //     question: '',
-  //     textDescription: '',
-  //   });
-  // };
 
   // useEffect(()=>{
   //   console.log("ssssss");
@@ -385,21 +399,10 @@ console.log("textBox props",props);
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
+            error={Boolean(errors.question)}
+            helperText={errors.question}
           />
-          {/* <TextField
-            label="Text Description"
-            fullWidth
-            value={formData.textDescription}
-            onChange={handleDescriptionChange}
-            margin="normal"
-            variant="outlined"
-            multiline
-            rows={4}
-            sx={{ mb: 2 }}
-          /> */}
-          {/* <Button variant="contained" color="primary" type="submit">
-            Submit
-          </Button> */}
+          
         </div>
       </form>
     </Box>

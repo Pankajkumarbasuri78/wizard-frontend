@@ -42,13 +42,7 @@ const DisplayPage = () => {
     });
   }, []);
 
-  // const renderDisplay = () => {
-  //   return (
-  //     <>
-  //       <h1>Data</h1>
-  //     </>
-  //   );
-  // };
+
 
   return (
     <Paper sx={{width:"95%", height:"95vh", margin:"15px auto", display:"flex"}} elevation={8}>
@@ -60,11 +54,13 @@ const DisplayPage = () => {
             justifyContent: "center",
             alignItems: "center",
             gap: "30px",
-            flexGrow: "0.2",
+            maxWidth:'350px',
+            padding: "0 30px"
           }}
         >
-          <div>Title-{initialData.title}</div>
-          <div>Description-{initialData.description}</div>
+
+          <div style={{}}><strong>Title</strong>-{initialData.title}</div>
+          <div><strong>Description</strong>-{initialData.description}</div>
           {/* <h6>{initialData.description}</h6> */}
           <div style={{ display: "flex", gap: "20px" }}>
             <Button
@@ -85,13 +81,12 @@ const DisplayPage = () => {
             </Button>
           </div>
 
-          {/* {renderDisplay()} */}
 
           {/* <br />
         <pre>{JSON.stringify(initialData, null, 2)}</pre>
         <br /> */}
         </div>
-        <div style={{ flexGrow: "0.8", height:"100%" }}>
+        <div style={{ flex: "1", height:"100%", overflowY:"scroll" }}>
           {Object.keys(completeFormDataContext).length && <PreviewForm />}
         </div>
       {/* </div> */}

@@ -6,8 +6,10 @@ import { WizardContext } from '../../Context/WizardContext';
 
 const MultiSelectOption = (props) => {
 
+  const [errors,setErrors] = useState({});
+
   //global state
-  const {completeFormDataContext,setId,id,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
+  const {completeFormDataContext,setId,id,setIsValid,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
 
   const [formData, setFormData] = useState({
     page:currentCount,
@@ -18,12 +20,55 @@ const MultiSelectOption = (props) => {
     answer:Object.keys(props).includes('answer')?props.answer:'',
   });
 
+  //validate question
+  const validateMcqForm = (e) =>{
+
+    let textValid = true;
+    const newErrors = {};
+
+    if(!e.question || e.question.trim() === ""){
+      newErrors.question = "Question field can't be empty";
+      textValid = false;
+    }else if (!/^[a-zA-Z]/.test(e.question)){
+      newErrors.question = "Qusetion should start with a letter";
+      textValid = false;
+    }else if(e.question.length < 10){
+      newErrors.question = "Question must be at least of 10 character";
+      textValid =false;
+    }
+
+
+    setErrors(newErrors);
+    return textValid;
+  }
+
+  //validate options
+  const validateOptionForm = (options) => {
+
+    let optionValid = true;
+    const newErrors = {};
+
+    options.forEach((option,i)=>{
+      if(!option || option.trim() === ""){
+        newErrors[`option${i+1}`] = `Option ${i+1} can't be empty`;
+        optionValid = false;
+      }
+
+    })
+
+    setErrors((previousError) => ({...previousError,...newErrors }));
+    return optionValid;
+  }
+
   const handleQuestionChange = (e) => {
     setFormData({ ...formData, question: e.target.value });
     updateCompleteFormData(formData.Uid, {
       ...formData,
       question: e.target.value,
     });
+
+    //validate question
+    setIsValid(validateMcqForm({question : e.target.value}));
   };
 
   const handleOptionChange = (index, value) => {
@@ -34,10 +79,15 @@ const MultiSelectOption = (props) => {
       ...formData,
       options: updatedOptions,
     });
+
+    //call validate
+    setIsValid(validateOptionForm(updatedOptions));
   };
 
   const addOption = () => {
-    if (formData.options.length < 4) {
+    const hasEmptyOption = formData.options.some((option) => option.trim() === '');
+
+    if (!hasEmptyOption && formData.options.length < 4) {
       setFormData({ ...formData, options: [...formData.options, ''] });
     }
   };
@@ -110,6 +160,8 @@ const MultiSelectOption = (props) => {
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
+            error={Boolean(errors.question)}
+            helperText={errors.question}
           />
           {/* <Button variant="contained" color="primary" type="submit" sx={{ display: 'flex', height: '53px' }}>
             Submit
@@ -126,6 +178,8 @@ const MultiSelectOption = (props) => {
                 fullWidth
                 variant="outlined"
                 sx={{ flex: 1, mr: 1 }}
+                error={Boolean[`option${index + 1}`]}
+                helperText={errors[`option${index + 1}`]}
               />
               <IconButton onClick={() => removeOption(index,formData.Uid)}>
                 <DeleteIcon />

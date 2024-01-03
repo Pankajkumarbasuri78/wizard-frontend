@@ -4,6 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { WizardContext } from '../../Context/WizardContext';
 
 const Dropdown = (props) => {
+  const [errors,setErrors] = useState({});
   // Global state
   const { completeFormDataContext, setCompleteFormDataContext,setIsValid,currentCount,id,setId } = useContext(WizardContext);
 
@@ -17,11 +18,53 @@ const Dropdown = (props) => {
     answer:Object.keys(props).includes('answer')?props.answer:'',
   });
 
+  //validate question
+  const validateDropdownForm = (e) =>{
+
+    let textValid = true;
+    const newErrors = {};
+
+    if(!e.question || e.question.trim() === ""){
+      newErrors.question = "Question field can't be empty";
+      textValid = false;
+    }else if (!/^[a-zA-Z]/.test(e.question)){
+      newErrors.question = "Qusetion should start with a letter";
+      textValid = false;
+    }else if(e.question.length < 10){
+      newErrors.question = "Question must be at least of 10 character";
+      textValid =false;
+    }
+
+
+    setErrors(newErrors);
+    return textValid;
+  }
+
+  //validate options
+  const validateOptionForm = (options) => {
+
+    let optionValid = true;
+    const newErrors = {};
+
+    options.forEach((option,i)=>{
+      if(!option || option.trim() === ""){
+        newErrors[`option${i+1}`] = `Option ${i+1} can't be empty`;
+        optionValid = false;
+      }
+
+    })
+
+    setErrors((previousError) => ({...previousError,...newErrors }));
+    return optionValid;
+  }
+
   const handleQuestionChange = (e) => {
     console.log("formmmmmmmmm",formData.Uid);
     setFormData({ ...formData, question: e.target.value });
     updateCompleteFormData(formData.Uid, { ...formData, question: e.target.value });
 
+    //validate question
+    setIsValid(validateDropdownForm({question : e.target.value}));
     
   };
 
@@ -31,11 +74,14 @@ const Dropdown = (props) => {
     setFormData({ ...formData, options: updatedOptions });
     updateCompleteFormData(formData.Uid, { ...formData, options: updatedOptions });
 
-   
+   //call validate
+   setIsValid(validateOptionForm(updatedOptions));
   };
 
   const addOption = () => {
-    if (formData.options.length < 4) {
+    const hasEmptyOption = formData.options.some((option) => option.trim() === '');
+
+    if (!hasEmptyOption && formData.options.length < 4) {
       setFormData({ ...formData, options: [...formData.options, ''] });
     }
   };
@@ -96,6 +142,8 @@ const Dropdown = (props) => {
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
+            error={Boolean(errors.question)}
+            helperText={errors.question}
           />
           
           {formData.options.map((option, index) => (
@@ -107,6 +155,8 @@ const Dropdown = (props) => {
                 fullWidth
                 variant="outlined"
                 sx={{ flex: 1, mr: 1 }}
+                error={Boolean[`option${index + 1}`]}
+                helperText={errors[`option${index + 1}`]}
               />
               <IconButton onClick={() => removeOption(index)}>
                 <DeleteIcon />

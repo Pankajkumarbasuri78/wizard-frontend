@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, {  useContext, useEffect } from "react";
 import TextBoxes from "../Component/InputField/TextBoxes";
 import CheckboxComponent from "../Component/InputField/Checkbox";
 import Dropdown from "../Component/InputField/Dropdown";
@@ -10,11 +10,9 @@ import { useNavigate,useParams } from "react-router-dom";
 
 import { WizardContext } from "../Context/WizardContext";
 import TextArea from "../Component/InputField/TextAreas";
-import StepTracker from "../Component/StepTracker";
-import Navbar from "./Navbar";
+
 import UiNavbar from "./UiNavbar";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -32,24 +30,16 @@ const UIPlanning = () => {
     currentCount,
     setCurrentCount,
     id,
-    isValid
+    isValid,
+    completeFormDataContext, 
+    setCompleteFormDataContext
   } = useContext(WizardContext);
 
   //console.log("context se hai");
   //console.log(wizardData);
 
-  const { completeFormDataContext, setCompleteFormDataContext } =
-    useContext(WizardContext);
 
   console.log("from context Completeformdata", completeFormDataContext);
-
-  const [completeFormData, setCompleteFormState] = useState({
-    textBoxes: [],
-    checkboxes: [],
-    dropdowns: [],
-    multiSelectOptions: [],
-    radioButtons: [],
-  });
 
   const handleOptionClick = (option) => {
     switch (option) {
@@ -220,6 +210,62 @@ const UIPlanning = () => {
   //   console.log("typeof remaiinshdjsguav", typeof RemainingData);
   // });
 
+
+  const handleFinalSubmit = () => {
+    const combinedObject = { ...wizardData, completeFormDataContext };
+    console.log("final data for backend");
+    console.log(combinedObject);
+    if(isValid){
+    //old data
+      if(userId){
+        axios.post(`http://localhost:8080/saveData/${userId}`,combinedObject,{
+          headers: {
+            "Content-Type":"application/json",
+          }
+        })
+        .then((res)=>{
+          console.log(`Data is sent to the backend with id ${userId} `,res.data);
+          const finalData = res.data;
+          console.log("USERRRidddddddddddd",finalData.id);
+          navigate(`/preview/${userId}`)
+        })
+        .catch((error)=>{
+          console.error("Error sending data to the backend:", error.message);
+        })
+      }
+    
+
+      //new data
+      else{
+          axios.post("http://localhost:8080/saveData", combinedObject, {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+            .then((response) => {
+                      console.log("Data sent to the backend successfully:", response.data);
+                      const finalData = response.data;
+                      console.log("idddddddddddd",finalData.id);
+                      navigate(`/preview/${finalData.id}`)
+              // navigate("/");
+              alert("Data is send to backend, you can preview now")
+            })
+            .catch((error) => {
+              console.error("Error sending data to the backend:", error.message);
+            });
+    }
+  }
+  else{
+    console.log("validate karo");
+        toast.warning("Give proper Validation!!!", {
+          autoClose: 1000,
+        });
+  }
+
+    // navigate('/')
+  };
+
+
   useEffect(() => {
     // console.log("aaaaaayyyyyyyaaaaaa");
     if (
@@ -311,53 +357,6 @@ const UIPlanning = () => {
     }
   }, [currentCount]);
 
-  const handleFinalSubmit = () => {
-    const combinedObject = { ...wizardData, completeFormDataContext };
-    console.log("final data for backend");
-    console.log(combinedObject);
-    
-    //old data
-      if(userId){
-        axios.post(`http://localhost:8080/saveData/${userId}`,combinedObject,{
-          headers: {
-            "Content-Type":"application/json",
-          }
-        })
-        .then((res)=>{
-          console.log(`Data is sent to the backend with id ${userId} `,res.data);
-          const finalData = res.data;
-          console.log("USERRRidddddddddddd",finalData.id);
-          navigate(`/preview/${userId}`)
-        })
-        .catch((error)=>{
-          console.error("Error sending data to the backend:", error.message);
-        })
-      }
-    
-
-      //new data
-      else{
-          axios.post("http://localhost:8080/saveData", combinedObject, {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            })
-            .then((response) => {
-                      console.log("Data sent to the backend successfully:", response.data);
-                      const finalData = response.data;
-                      console.log("idddddddddddd",finalData.id);
-                      navigate(`/preview/${finalData.id}`)
-              // navigate("/");
-              alert("Data is send to backend, you can preview now")
-            })
-            .catch((error) => {
-              console.error("Error sending data to the backend:", error.message);
-            });
-    }
-
-    // navigate('/')
-  };
-
   return (
     <>
       <div>
@@ -422,6 +421,7 @@ const UIPlanning = () => {
               variant="contained"
               color="success"
               onClick={handleSubmitAll}
+              disabled={currentCount == wizardData.totalSteps}
             >
               Submit
             </Button>

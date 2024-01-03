@@ -11,6 +11,7 @@ import StepTracker from "../Component/StepTracker";
 import { WizardContext } from "../Context/WizardContext";
 import Button from "@mui/material/Button";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 const UiNavbar = () => {
 
@@ -18,6 +19,7 @@ const UiNavbar = () => {
   const navigate = useNavigate();
 
   const {
+    isValid,
     wizardData,
     currentCount,
     setPage,
@@ -37,16 +39,42 @@ const UiNavbar = () => {
       console.log("nothing is there");
     }
   };
-
+  // if (isValid) {
+  //   toast.success("Ready to go Next Page", {
+  //     autoClose: 500,
+  //     onClose: () => {
+  //       setPage(page + 1);
+  //       setCurrentCount(currentCount + 1);
+  //       handleRemoveAllComponent();
+  //     },
+  //   });
+  // } else {
+  //   console.log("validate karo");
+  //   toast.warning("Give proper Validation!!!", {
+  //     autoClose: 1000,
+  //   });
+  // }
   const handleNextPage = () => {
+    
     if (currentCount == wizardData.totalSteps) {
       alert("over");
+    } 
+    else if (isValid) {
+      toast.success("Ready to go Next Page", {
+        autoClose: 500,
+        onClose: () => {
+          setPage(page + 1);
+          setCurrentCount(currentCount + 1);
+          handleRemoveAllComponent();
+        },
+      });
     } else {
-      setPage(page + 1);
-      setCurrentCount(currentCount + 1);
-      console.log(page);
-      handleRemoveAllComponent();
+      console.log("validate karo");
+      toast.warning("Give proper Validation!!!", {
+        autoClose: 1000,
+      });
     }
+
   };
 
   const handlePrevPage = () => {

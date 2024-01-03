@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Typography, TextField, Button, FormControl, Box, Checkbox, IconButton } from '@mui/material';
+import { Typography, TextField, Button,  Box,  IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import '../../CSS/textboxes.css';
 import { WizardContext } from '../../Context/WizardContext';
@@ -9,7 +9,7 @@ const CheckboxComponent = (props) => {
   const [errors,setErrors] = useState({});
 
   //global state
-  const {completeFormDataContext,setCompleteFormDataContext,setIsValid,currentCount,id,setId} = useContext(WizardContext)
+  const {setCompleteFormDataContext,setIsValid,currentCount,id,setId} = useContext(WizardContext)
 
   // useEffect(()=>{
   //   // console.log('object',Object.keys(props).includes('question')?props.question:'');
@@ -86,7 +86,9 @@ const CheckboxComponent = (props) => {
   };
 
   const addOption = () => {
-    if (formData.options.length < 4) {
+    const hasEmptyOption = formData.options.some((option) => option.trim() === '');
+
+    if (!hasEmptyOption && formData.options.length < 4) {
       setFormData({ ...formData, options: [...formData.options, ''] });
     }
   };

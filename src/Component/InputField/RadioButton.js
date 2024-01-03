@@ -6,8 +6,10 @@ import { WizardContext } from '../../Context/WizardContext';
 
 const RadioButton = (props) => {
 
+  const [errors,setErrors] = useState({});
+
   //global state
-  const {completeFormDataContext,setId,id,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
+  const {completeFormDataContext,setId,setIsValid,id,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
 
 
   const [formData, setFormData] = useState({
@@ -19,12 +21,37 @@ const RadioButton = (props) => {
     answer:Object.keys(props).includes('answer')?props.answer:'',
   });
 
+  //validate question
+  const validateRadioForm = (e) =>{
+
+    let textValid = true;
+    const newErrors = {};
+
+    if(!e.question || e.question.trim() === ""){
+      newErrors.question = "Question field can't be empty";
+      textValid = false;
+    }else if (!/^[a-zA-Z]/.test(e.question)){
+      newErrors.question = "Qusetion should start with a letter";
+      textValid = false;
+    }else if(e.question.length < 10){
+      newErrors.question = "Question must be at least of 10 character";
+      textValid =false;
+    }
+
+
+    setErrors(newErrors);
+    return textValid;
+  }
+
   const handleQuestionChange = (e) => {
     setFormData({ ...formData, question: e.target.value });
     updateCompleteFormData(formData.Uid, {
       ...formData,
       question: e.target.value,
     });
+
+    //validate question
+    setIsValid(validateRadioForm({question : e.target.value}));
   };
 
   const handleOptionChange = (index, value) => {
@@ -142,6 +169,8 @@ const RadioButton = (props) => {
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
+            error={Boolean(errors.question)}
+            helperText={errors.question}
           />
           {/* <Button variant="contained" color="primary" type="submit" sx={{ display: 'flex', height: '53px' }}>
             Submit
