@@ -53,7 +53,7 @@ const UiNavbar = () => {
     console.log("open page1 edit");
     if (currentCount > 1) {
       setCurrentCount(currentCount - 1);
-      // handleRemoveAllComponent();
+       handleRemoveAllComponent();
     } else {
       alert("negative");
     }
