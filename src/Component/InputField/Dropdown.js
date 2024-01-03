@@ -1,28 +1,37 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext,useEffect } from 'react';
 import { Typography, TextField, Button, Box, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { WizardContext } from '../../Context/WizardContext';
 
-const Dropdown = ({ onRemove }) => {
+const Dropdown = (props) => {
   // Global state
-  const { completeFormDataContext, setCompleteFormDataContext, globalSeq, setGlobalSeq } = useContext(WizardContext);
+  const { completeFormDataContext, setCompleteFormDataContext,setIsValid,currentCount,id,setId } = useContext(WizardContext);
 
   // Local state
   const [formData, setFormData] = useState({
+    page:currentCount,
     type: 'dropdown',
-    question: '',
-    options: [],
-    seq: globalSeq,
+    question: Object.keys(props).includes('question')?props.question:'',
+    options: Object.keys(props).includes('options')?props.options:[],
+    Uid: props.uniqueId,
+    answer:''
   });
 
   const handleQuestionChange = (e) => {
+    console.log("formmmmmmmmm",formData.Uid);
     setFormData({ ...formData, question: e.target.value });
+    updateCompleteFormData(formData.Uid, { ...formData, question: e.target.value });
+
+    
   };
 
   const handleOptionChange = (index, value) => {
     const updatedOptions = [...formData.options];
     updatedOptions[index] = value;
     setFormData({ ...formData, options: updatedOptions });
+    updateCompleteFormData(formData.Uid, { ...formData, options: updatedOptions });
+
+   
   };
 
   const addOption = () => {
@@ -31,38 +40,53 @@ const Dropdown = ({ onRemove }) => {
     }
   };
 
-  const removeOption = (index) => {
+  const removeOption = (index,uid) => {
     const updatedOptions = [...formData.options];
     updatedOptions.splice(index, 1);
     setFormData({ ...formData, options: updatedOptions });
+
+    setCompleteFormDataContext((prevContext) => {
+      const updatedContext = {...prevContext};
+      const currentPageData = {...updatedContext[currentCount]};
+
+      if(currentPageData && currentPageData[uid]) {
+        const currentPageOptions = [...currentPageData[uid].options];
+
+        if(currentPageOptions) {
+          currentPageOptions.splice(index,1);
+          currentPageData[uid].options = currentPageOptions;
+          updatedContext[currentCount] = currentPageData;
+
+          return updatedContext;
+        }
+      }
+
+      return prevContext;
+    })
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    setGlobalSeq(globalSeq + 1);
-
-    console.log('From Dropdown comp. :', formData);
-
-    // Clone and update context data
-    const dropdownUpdate = { ...completeFormDataContext };
-    dropdownUpdate.dropdowns.push(formData);
-
-    setCompleteFormDataContext(dropdownUpdate);
-    onRemove();
-
-    setFormData({
-      question: '',
-      options: [],
-    });
+  const updateCompleteFormData = (uid, updatedData) => {
+    setId(id+1);
+    if(uid){
+    setCompleteFormDataContext((prevContext) => ({
+      ...prevContext,
+      [formData.page]: {
+        ...prevContext[formData.page],
+        [uid]: updatedData,
+      },
+    }));}
   };
+
+  useEffect(()=>{
+    updateCompleteFormData(formData.Uid,formData);
+  },[])
 
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', padding: '20px', backgroundColor: '#F3F5F0', borderRadius: '8px', boxShadow: '0px 3px 6px #00000029' }}>
       <Typography variant="h5" gutterBottom>
         Create Your Dropdown Wizard
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form>
         <div style={{display:'flex',flexDirection:'column'}}>
           <TextField
             label="Question"
@@ -73,11 +97,9 @@ const Dropdown = ({ onRemove }) => {
             variant="outlined"
             sx={{ mb: 2 }}
           />
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Options (up to 4):
-          </Typography>
+          
           {formData.options.map((option, index) => (
-            <div key={index}>
+            <div key={index} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: '8px', backgroundColor: '#ffffff', boxShadow: '0px 3px 6px #00000029', borderRadius: '8px', padding: '8px' }}>
               <TextField
                 label={`Option ${index + 1}`}
                 value={option}
@@ -92,15 +114,13 @@ const Dropdown = ({ onRemove }) => {
             </div>
           ))}
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={addOption}
             disabled={formData.options.length === 4}
             sx={{ mt: 2 }}
+            style={{width:150}}
           >
             Add Option
-          </Button>
-          <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>
-            Submit
           </Button>
         </div>
       </form>

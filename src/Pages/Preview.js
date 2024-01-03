@@ -96,6 +96,35 @@ const PreviewForm = () => {
     };
 
     switch (type) {
+      case "dropdown":
+  return (
+    <div key={questionId}>
+      <Typography variant="body1" gutterBottom>
+        {question}
+      </Typography>
+      <FormControl fullWidth>
+        <InputLabel id={`dropdown-label-${questionId}`}>
+          Select an option
+        </InputLabel>
+        <Select
+          labelId={`dropdown-label-${questionId}`}
+          id={`dropdown-${questionId}`}
+          value={completeFormDataContext[page][questionId]?.answer || ""}
+          label={`Select an option for ${question}`}
+          onChange={(e) =>
+            handleOptionChange(questionId, e.target.value, page)
+          }
+        >
+          {options.map((option, index) => (
+            <MenuItem key={index} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+  );
+
       case "checkbox":
         return (
           <div key={questionId}>

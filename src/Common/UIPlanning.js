@@ -80,10 +80,9 @@ const UIPlanning = () => {
         setSelectedComponents([
           ...selectedComponents,
           <Dropdown
-            setCompleteFormState={setCompleteFormState}
-            completeFormData={completeFormData}
-            key={selectedComponents.length}
-            onRemove={() => handleRemoveComponent(selectedComponents.length)}
+          key={selectedComponents.length}
+          uniqueId={id}
+            // onRemove={() => handleRemoveComponent(selectedComponents.length)}
           />,
         ]);
         break;
