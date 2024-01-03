@@ -344,6 +344,8 @@ const PreviewForm = () => {
     <div className="submit">
       <div className="user_form">
         <div className="user_form_section">
+          {/* <div style={{display:'flex',justifyContent:'center',alignItems:'center',padding:'10px',fontFamily:'sans-serif',fontSize:'larger',fontWeight:'bold'}}>{wizardData.title}</div> */}
+          
           {Object.keys(completeFormDataContext).map((page) => {
             const pageNumber = parseInt(page, 10);
             console.log("pageNumber", pageNumber);
@@ -359,6 +361,7 @@ const PreviewForm = () => {
 
             return (
               <Paper elevation={8}>
+                 <div style={{display:'flex',justifyContent:'center',alignItems:'center',paddingTop:'20px',fontFamily:'sans-serif',fontSize:'larger',fontWeight:'bold'}}>{wizardData.title}</div>
                 <div key={`page-${page}`} className="user_form_questions">
                   {questions.map((questionId,index) => (
                     <div key={`question-${questionId}`}>
