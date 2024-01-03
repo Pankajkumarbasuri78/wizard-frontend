@@ -14,7 +14,7 @@ const Dropdown = (props) => {
     question: Object.keys(props).includes('question')?props.question:'',
     options: Object.keys(props).includes('options')?props.options:[],
     Uid: props.uniqueId,
-    answer:''
+    answer:Object.keys(props).includes('answer')?props.answer:'',
   });
 
   const handleQuestionChange = (e) => {

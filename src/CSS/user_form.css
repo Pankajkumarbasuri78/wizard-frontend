@@ -2,11 +2,11 @@
 .user_form{
     
     background-color:#F4F4F9;
-    min-height:100vh;
+    /* min-height:100vh; */
     padding:20px;
 }
 .submit{
-    
+    height:100%;
     background-color:#F4F4F9;
     
 }

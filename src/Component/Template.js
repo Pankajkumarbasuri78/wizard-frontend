@@ -16,11 +16,25 @@ const Template = () => {
       } catch (error) {
         console.log("error in fetching data", error);
       }
+
+      try {
+        const res = await axios.get("http://localhost:8080/getDataRes");
+        console.log("json data with res- ", res.data);
+        // setWizardId(res.data);
+        
+      } catch (error) {
+        console.log("error in fetching data", error);
+      }
     };
 
     getDataFrombackend();
   }, []);
 
+  const handleData = (wizard,i) =>{
+    const data = JSON.parse(wizard.jsonData);
+    console.log("wizarddatattatattata",data);
+    return data.title;
+  }
   return (
     <div className="templateLayout">
       <div className="templateWrapper">
@@ -29,9 +43,12 @@ const Template = () => {
         {wizardId.map((wizard, i) => (
           <div key={i}>
             {/* {wizard.id} */}
+
             <CardComp
               key={wizard.id}
-              title={`Go To Wizard ${wizard.id}`}
+              title={handleData(wizard,i)}
+              title1={`${wizard.id}`}
+              // title={`Go To Wizard ${wizard.id}`}
               id={wizard.id}
             />
           </div>

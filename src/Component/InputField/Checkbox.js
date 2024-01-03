@@ -23,7 +23,7 @@ const CheckboxComponent = (props) => {
     question: Object.keys(props).includes('question')?props.question:'',
     options: Object.keys(props).includes('options')?props.options:[],
     Uid: props.uniqueId,
-    answer:''
+    answer:Object.keys(props).includes('answer')?props.answer:'',
   });
 
   //validate question
@@ -159,11 +159,7 @@ useEffect(()=>{
         {/* <FormControl component="fieldset" sx={{ mb: 4, mt: 2 }}> */}
           {formData.options.map((option, index) => (
             <div key={index} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: '8px', backgroundColor: '#ffffff', boxShadow: '0px 3px 6px #00000029', borderRadius: '8px', padding: '8px' }}>
-              <Checkbox
-                value={option}
-                onChange={(e) => handleOptionChange(index, e.target.checked ? e.target.value : '')}
-                sx={{ mr: 1 }}
-              />
+              
               <TextField
                 label={`Option ${index + 1}`}
                 value={option}

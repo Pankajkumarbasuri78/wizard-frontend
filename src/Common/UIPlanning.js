@@ -240,7 +240,7 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
-
+                answer={filterData.answer}
               />
             );
 
@@ -251,6 +251,7 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
+                answer={filterData.answer}
 
               />
             );
@@ -262,6 +263,7 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
+                answer={filterData.answer}
               />
             );
 
@@ -272,6 +274,7 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
+                answer={filterData.answer}
               />
             );
 
@@ -282,6 +285,7 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 textDescription={filterData.textDescription}
+                answer={filterData.answer}
               />
             );
             case "dropdown":
@@ -291,6 +295,7 @@ const UIPlanning = () => {
                 uniqueId={filterData.Uid}
                 question={filterData.question}
                 options={filterData.options}
+                answer={filterData.answer}
               />
             );
 

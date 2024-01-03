@@ -14,7 +14,7 @@ const TextArea = (props) => {
     textDescription: Object.keys(props).includes('textDescription')?props.textDescription:'',
     //options: Object.keys(props).includes('options')?props.options:[],
     Uid: props.uniqueId,
-    
+    answer:Object.keys(props).includes('answer')?props.answer:'',
     
     
   });

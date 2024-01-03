@@ -23,6 +23,7 @@ import axios from "axios";
 
 const PreviewForm = () => {
   const { userId } = useParams();
+  console.log("preview user id",userId);
   const { wizardData, completeFormDataContext, setCompleteFormDataContext } =
     useContext(WizardContext);
   const navigate = useNavigate();
@@ -74,6 +75,24 @@ const PreviewForm = () => {
       .catch((error) => {
         console.log("Error sending data to the backend", error.message);
       });
+
+
+      axios
+      .post(`http://localhost:8080/saveUserRes/${userId}`, combinedObject, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log(
+          "Data sent to the backend successfully with answer",
+          response.data
+        );
+        navigate("/");
+      })
+      .catch((error) => {
+        console.log("Error sending data to the backend", error.message);
+      });
   };
 
   const handleBack = () => {
@@ -110,6 +129,7 @@ const PreviewForm = () => {
               {question}
             </Typography>
             </div>
+            {console.log("textFiled se pehle",completeFormDataContext[page][questionId])}
             <TextField
               fullWidth
               variant="outlined"

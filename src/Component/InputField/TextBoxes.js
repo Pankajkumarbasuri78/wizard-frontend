@@ -293,7 +293,7 @@ import { WizardContext } from '../../Context/WizardContext';
 const TextBoxes = (props) => {
   // Global state,
   const { completeFormDataContext,setId,id, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
-
+console.log("textBox props",props);
   // Local state
   const [formData, setFormData] = useState({
     page:currentCount,
@@ -302,8 +302,7 @@ const TextBoxes = (props) => {
     textDescription: Object.keys(props).includes('textDescription')?props.textDescription:'',
     //options: Object.keys(props).includes('options')?props.options:[],
     Uid: props.uniqueId,
-    
-    
+    answer:Object.keys(props).includes('answer')?props.answer:'',
     
   });
 

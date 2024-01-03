@@ -69,20 +69,21 @@ const UiNavbar = () => {
     
     //old data
       if(userId){
-        axios.post(`http://localhost:8080/saveData/${userId}`,combinedObject,{
-          headers: {
-            "Content-Type":"application/json",
-          }
-        })
-        .then((res)=>{
-          console.log(`Data is sent to the backend with id ${userId} `,res.data);
-          const finalData = res.data;
-          console.log("USERRRidddddddddddd",finalData.id);
+        
+        // axios.post(`http://localhost:8080/saveData/${userId}`,combinedObject,{
+        //   headers: {
+        //     "Content-Type":"application/json",
+        //   }
+        // })
+        // .then((res)=>{
+        //   console.log(`Data is sent to the backend with id ${userId} `,res.data);
+        //   const finalData = res.data;
+        //   console.log("USERRRidddddddddddd",finalData.id);
           navigate(`/preview/${userId}`)
-        })
-        .catch((error)=>{
-          console.error("Error sending data to the backend:", error.message);
-        })
+        // })
+        // .catch((error)=>{
+        //   console.error("Error sending data to the backend:", error.message);
+        // })
       }
     
 
