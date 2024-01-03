@@ -1,5 +1,5 @@
-import '../CSS/user_form.css';
-import React, { useContext, useState } from 'react';
+import "../CSS/user_form.css";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   Typography,
@@ -8,16 +8,17 @@ import {
   MenuItem,
   InputLabel,
   Paper,
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { WizardContext } from '../Context/WizardContext';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { WizardContext } from "../Context/WizardContext";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 
 const PreviewForm = () => {
   const { userId } = useParams();
-  const { wizardData, completeFormDataContext, setCompleteFormDataContext } = useContext(WizardContext);
+  const { wizardData, completeFormDataContext, setCompleteFormDataContext } =
+    useContext(WizardContext);
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,18 +42,18 @@ const PreviewForm = () => {
     axios
       .post(`http://localhost:8080/saveData/${userId}`, combinedObject, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       })
       .then((response) => {
         console.log(
-          'Data sent to the backend successfully with answer',
+          "Data sent to the backend successfully with answer",
           response.data
         );
-        navigate('/');
+        navigate("/");
       })
       .catch((error) => {
-        console.log('Error sending data to the backend', error.message);
+        console.log("Error sending data to the backend", error.message);
       });
   };
 
@@ -83,9 +84,11 @@ const PreviewForm = () => {
           <Select
             labelId={`dropdown-label-${questionId}`}
             id={`dropdown-${questionId}`}
-            value={completeFormDataContext[page][questionId]?.answer || ''}
+            value={completeFormDataContext[page][questionId]?.answer || ""}
             label={`Select an option for ${question}`}
-            onChange={(e) => handleOptionChange(questionId, e.target.value, page)}
+            onChange={(e) =>
+              handleOptionChange(questionId, e.target.value, page)
+            }
           >
             {options.map((option, index) => (
               <MenuItem key={index} value={option}>
@@ -98,19 +101,18 @@ const PreviewForm = () => {
     );
   };
 
-  const arrayOfPages = Object.keys(completeFormDataContext).map((page) => parseInt(page, 10))
-  
+  const arrayOfPages = Object.keys(completeFormDataContext).map((page) =>
+    parseInt(page, 10)
+  );
 
   const getNextPage = (current) => {
     const nextPage = arrayOfPages.find((page) => page > current);
-    return nextPage; 
+    return nextPage;
   };
 
   const getPreviousPage = (current) => {
-    const previousPage = arrayOfPages
-      .reverse()
-      .find((page) => page < current);
-    return previousPage; 
+    const previousPage = arrayOfPages.reverse().find((page) => page < current);
+    return previousPage;
   };
 
   const handleNextPage = () => {
@@ -122,9 +124,24 @@ const PreviewForm = () => {
     const previousPage = getPreviousPage(currentPage);
     setCurrentPage(previousPage);
   };
-  
-  console.log("preview cfdc",completeFormDataContext);
 
+  console.log("preview cfdc", completeFormDataContext);
+
+
+  const handlePrevDisable = () => {
+    return currentPage === arrayOfPages[0]
+  }
+
+  const handleNextDisable = () =>{
+    return currentPage ===  arrayOfPages[arrayOfPages.length-1];
+  }
+
+  // useEffect(()=>{
+  //   console.log("useCurrentpage",currentPage);
+  //   console.log("array",arrayOfPages[arrayOfPages.length-1]);
+  //   console.log(currentPage ===  arrayOfPages[arrayOfPages.length-1]);
+  //   console.log("firsttttt",arrayOfPages[0]);
+  // },[currentPage])
 
   return (
     <div className="submit">
@@ -132,51 +149,78 @@ const PreviewForm = () => {
         <div className="user_form_section">
           {Object.keys(completeFormDataContext).map((page) => {
             const pageNumber = parseInt(page, 10);
-            console.log("pageNumber",pageNumber);
+            console.log("pageNumber", pageNumber);
             if (pageNumber !== currentPage) {
               console.log("yyyy");
-              return null; 
+              return null;
             }
 
             const questions = Object.keys(completeFormDataContext[page]);
             if (questions.length === 0) {
-              return null; 
+              return null;
             }
 
             return (
               <Paper elevation={8}>
-              <div key={`page-${page}`} className="user_form_questions">
-                {questions.map((questionId) => (
-                  <div key={`question-${questionId}`}>
-                    {renderQuestion(questionId,completeFormDataContext[page][questionId],page)}
+                <div key={`page-${page}`} className="user_form_questions">
+                  {questions.map((questionId) => (
+                    <div key={`question-${questionId}`}>
+                      {renderQuestion(
+                        questionId,
+                        completeFormDataContext[page][questionId],
+                        page
+                      )}
+                    </div>
+                  ))}
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 20,
+                      justifyContent: "space-between",
+                      marginTop: "20px",
+                    }}
+                  >
+                    {/* <SkipPreviousIcon
+                      onClick={handlePreviousPage}
+                      sx={{
+                        color: "red",
+                        fontSize: 30,
+                        cursor: "pointer",
+                        ":hover": { color: "blue" },
+                      }}
+                    /> */}
+                    <Button variant="outlined" color="primary" onClick={handlePreviousPage} disabled={handlePrevDisable()}>
+                      Prev
+                    </Button>
+
+                    <Button variant="outlined" color="primary" onClick={handleSubmit} disabled={!handleNextDisable()}>
+                      Submit
+                    </Button>
+                    <Button variant="outlined" color="primary" onClick={handleBack} >
+                      Back
+                    </Button>
+
+
+                    <Button variant="outlined" color="primary" onClick={handleNextPage} disabled={handleNextDisable()}>
+                      Next
+                    </Button>
+                    
+
+                    {/* <SkipNextIcon
+                      sx={{
+                        color: "red",
+                        fontSize: 30,
+                        cursor: "pointer",
+                        ":hover": { color: "blue" },
+                      }}
+                      onClick={handleNextPage}
+                      
+                    /> */}
                   </div>
-                ))}
-                <Button
-              variant="contained"
-              color="primary"
-              onClick={handlePreviousPage}
-            >
-              Previous
-            </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleNextPage}
-                >
-                  Next
-                </Button>
-              </div>
+                </div>
               </Paper>
             );
           })}
-        </div>
-        <div className="user_form_submit">
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Submit
-          </Button>
-          <Button variant="contained" color="primary" onClick={handleBack}>
-            Back
-          </Button>
         </div>
       </div>
     </div>
@@ -184,9 +228,3 @@ const PreviewForm = () => {
 };
 
 export default PreviewForm;
-
-
-
-
-
-
