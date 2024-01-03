@@ -284,6 +284,15 @@ const UIPlanning = () => {
                 textDescription={filterData.textDescription}
               />
             );
+            case "dropdown":
+            return (
+              <Dropdown
+                key={filterData.Uid}
+                uniqueId={filterData.Uid}
+                question={filterData.question}
+                options={filterData.options}
+              />
+            );
 
           default:
             break;

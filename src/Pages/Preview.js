@@ -23,7 +23,8 @@ import axios from "axios";
 
 const PreviewForm = () => {
   const { userId } = useParams();
-  const { wizardData, completeFormDataContext, setCompleteFormDataContext } = useContext(WizardContext);
+  const { wizardData, completeFormDataContext, setCompleteFormDataContext } =
+    useContext(WizardContext);
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -79,13 +80,15 @@ const PreviewForm = () => {
     navigate(`/ui/${userId}`);
   };
 
-  const renderQuestion = (questionId, questionData, page) => {
+  const renderQuestion = (questionId, questionData, page,questionNo) => {
     console.log("here");
     if (
       !completeFormDataContext ||
       !completeFormDataContext[page] ||
       !questionData ||
-      (questionData.type !== "textarea" && !Array.isArray(questionData.options))
+      (questionData.type !== "textarea" &&
+        questionData.type !== "textbox" &&
+        !Array.isArray(questionData.options))
     ) {
       return null;
     }
@@ -96,41 +99,73 @@ const PreviewForm = () => {
     };
 
     switch (type) {
-      case "dropdown":
-  return (
-    <div key={questionId}>
-      <Typography variant="body1" gutterBottom>
-        {question}
-      </Typography>
-      <FormControl fullWidth>
-        <InputLabel id={`dropdown-label-${questionId}`}>
-          Select an option
-        </InputLabel>
-        <Select
-          labelId={`dropdown-label-${questionId}`}
-          id={`dropdown-${questionId}`}
-          value={completeFormDataContext[page][questionId]?.answer || ""}
-          label={`Select an option for ${question}`}
-          onChange={(e) =>
-            handleOptionChange(questionId, e.target.value, page)
-          }
-        >
-          {options.map((option, index) => (
-            <MenuItem key={index} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
-  );
-
-      case "checkbox":
+      case "textbox":
         return (
-          <div key={questionId}>
+          <div key={questionId} style={{ marginBottom: "20px" }}>
+            <div style={{display:'flex',gap:'5px'}}>
+            <Typography>
+              {questionNo+"."}
+            </Typography>
             <Typography variant="body1" gutterBottom>
               {question}
             </Typography>
+            </div>
+            <TextField
+              fullWidth
+              variant="outlined"
+              value={completeFormDataContext[page][questionId]?.answer || ""}
+              onChange={(e) =>
+                handleOptionChange(questionId, e.target.value, page)
+              }
+            />
+          </div>
+        );
+
+      case "dropdown":
+        return (
+          <div key={questionId} style={{ marginBottom: "20px" }}>
+            <div style={{display:'flex',gap:'5px'}}>
+            <Typography>
+              {questionNo+"."}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {question}
+            </Typography>
+            </div>
+            <FormControl fullWidth sx={{marginTop:'10px'}}>
+              <InputLabel id={`dropdown-label-${questionId}`}>
+                Select an option
+              </InputLabel>
+              <Select
+                labelId={`dropdown-label-${questionId}`}
+                id={`dropdown-${questionId}`}
+                value={completeFormDataContext[page][questionId]?.answer || ""}
+                label={`Select an option for ${question}`}
+                onChange={(e) =>
+                  handleOptionChange(questionId, e.target.value, page)
+                }
+              >
+                {options.map((option, index) => (
+                  <MenuItem key={index} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+        );
+
+      case "checkbox":
+        return (
+          <div key={questionId} style={{ marginBottom: "20px" }}>
+            <div style={{display:'flex',gap:'5px'}}>
+            <Typography>
+              {questionNo+"."}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {question}
+            </Typography>
+            </div>
             <FormGroup>
               {options.map((option, index) => (
                 <FormControlLabel
@@ -157,10 +192,15 @@ const PreviewForm = () => {
 
       case "radio":
         return (
-          <div key={questionId}>
+          <div key={questionId} style={{ marginBottom: "20px" }}>
+            <div style={{display:'flex',gap:'5px'}}>
+            <Typography>
+              {questionNo+"."}
+            </Typography>
             <Typography variant="body1" gutterBottom>
               {question}
             </Typography>
+            </div>
             <RadioGroup
               value={completeFormDataContext[page][questionId]?.answer || ""}
               onChange={(e) =>
@@ -181,11 +221,16 @@ const PreviewForm = () => {
 
       case "mcq":
         return (
-          <div key={questionId}>
+          <div key={questionId} style={{ marginBottom: "20px" }}>
+            <div style={{display:'flex',gap:'5px'}}>
+            <Typography>
+              {questionNo+"."}
+            </Typography>
             <Typography variant="body1" gutterBottom>
               {question}
             </Typography>
-            <FormControl fullWidth>
+            </div>
+            <FormControl fullWidth sx={{marginTop:'10px'}}>
               <InputLabel id={`multiselect-label-${questionId}`}>
                 Select multiple options
               </InputLabel>
@@ -217,21 +262,27 @@ const PreviewForm = () => {
         );
       case "textarea":
         return (
-          <div key={questionId}>
+          <div key={questionId} style={{ marginBottom: "20px" }}>
+            <div style={{display:'flex',gap:'5px'}}>
+            <Typography>
+              {questionNo+"."}
+            </Typography>
             <Typography variant="body1" gutterBottom>
               {question}
             </Typography>
+            </div>
             <TextField
               label="Text Description"
               fullWidth
+              multiline
+              rows={4}
               value={
                 completeFormDataContext[page][questionId]?.textDescription || ""
               }
               onChange={(e) => {
                 handleDescriptionChange(questionId, e.target.value, page);
               }}
-              rows={4}
-              sx={{ mb: 2 }}
+              sx={{ mb: 2,marginTop:'10px' }}
             />
           </div>
         );
@@ -240,8 +291,6 @@ const PreviewForm = () => {
         return null;
     }
   };
-
-
 
   const arrayOfPages = Object.keys(completeFormDataContext).map((page) =>
     parseInt(page, 10)
@@ -311,13 +360,13 @@ const PreviewForm = () => {
             return (
               <Paper elevation={8}>
                 <div key={`page-${page}`} className="user_form_questions">
-                  {questions.map((questionId) => (
+                  {questions.map((questionId,index) => (
                     <div key={`question-${questionId}`}>
                       {console.log("question not map", questionId)}
                       {renderQuestion(
                         questionId,
                         completeFormDataContext[page][questionId],
-                        page
+                        page,index+1
                       )}
                     </div>
                   ))}
@@ -329,7 +378,6 @@ const PreviewForm = () => {
                       marginTop: "20px",
                     }}
                   >
-                    
                     <Button
                       variant="outlined"
                       color="primary"
@@ -363,8 +411,6 @@ const PreviewForm = () => {
                     >
                       Next
                     </Button>
-
-                    
                   </div>
                 </div>
               </Paper>
