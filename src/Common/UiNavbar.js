@@ -95,6 +95,7 @@ const UiNavbar = () => {
     console.log("final data for backend");
     console.log(combinedObject);
     
+    if(isValid){
     //old data
       if(userId){
         
@@ -134,11 +135,19 @@ const UiNavbar = () => {
               console.error("Error sending data to the backend:", error.message);
             });
     }
+  }
+
+  else{
+    toast.warning("Give proper Validation!!!", {
+      autoClose: 1000,
+    });
+  }
 
     // navigate('/')
   };
 
   return (
+    <>
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" style={{backgroundColor:'#3a4664'}}>
         <Toolbar>
@@ -198,6 +207,18 @@ const UiNavbar = () => {
         </Toolbar>
       </AppBar>
     </Box>
+    <ToastContainer
+    position="bottom-left"
+    autoClose={false}
+    hideProgressBar={true}
+    newestOnTop={false}
+    closeOnClick
+    rtl={false}
+    pauseOnFocusLoss
+    draggable
+    pauseOnHover
+  />
+  </>
   );
 };
 

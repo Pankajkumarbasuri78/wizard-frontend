@@ -13,6 +13,7 @@ const DisplayPage = () => {
     setCompleteFormDataContext,
     wizardData,
     setWizardData,
+    setIsValid
   } = useContext(WizardContext);
 
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const DisplayPage = () => {
   const handleEdit = () => {
     console.log("backend context", completeFormDataContext);
     console.log("wizard data", wizardData);
+    setIsValid(true);
     navigate(`/ui/${userId}`);
   };
 

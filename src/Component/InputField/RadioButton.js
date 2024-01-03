@@ -9,7 +9,7 @@ const RadioButton = (props) => {
   const [errors,setErrors] = useState({});
 
   //global state
-  const {completeFormDataContext,setId,setIsValid,id,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
+  const {completeFormDataContext,selectedComponents,setId,setIsValid,id,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
 
 
   const [formData, setFormData] = useState({
@@ -27,15 +27,20 @@ const RadioButton = (props) => {
     let textValid = true;
     const newErrors = {};
 
-    if(!e.question || e.question.trim() === ""){
+    if (!e.question || e.question.trim() === "") {
       newErrors.question = "Question field can't be empty";
       textValid = false;
-    }else if (!/^[a-zA-Z]/.test(e.question)){
+    } else if (!/^[a-zA-Z]/.test(e.question)) {
       newErrors.question = "Qusetion should start with a letter";
       textValid = false;
-    }else if(e.question.length < 10){
+    } else if (e.question[0] !== e.question[0].toUpperCase()) {
+      newErrors.question = "Question should start with uppercase character";
+      textValid = false;
+    } else if (/^\d/.test(e.question)) {
+      newErrors.question = "Question shout not start with a number";
+    } else if (e.question.length < 10) {
       newErrors.question = "Question must be at least of 10 character";
-      textValid =false;
+      textValid = false;
     }
 
 
@@ -117,6 +122,15 @@ const RadioButton = (props) => {
 
   useEffect(() => {
     updateCompleteFormData(formData.Uid, formData);
+    const allCheckBox = selectedComponents.filter((element)=>element.type.name==='RadioButton');
+  let validationStatus = true;
+  allCheckBox.forEach((radio)=>{
+    const validationValue = validateRadioForm({question: radio.props.question})
+    validationStatus = validationStatus && validationValue
+    if(!validationStatus)
+      return;
+  })
+  setIsValid(validationStatus);
   }, []);
   // const handleSubmit = (e) => {
   //   e.preventDefault();

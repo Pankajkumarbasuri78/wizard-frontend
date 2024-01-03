@@ -352,6 +352,7 @@ const PreviewForm = () => {
   //   console.log(currentPage ===  arrayOfPages[arrayOfPages.length-1]);
   //   console.log("firsttttt",arrayOfPages[0]);
   // },[currentPage])
+  
   useEffect(() => {
     console.log("all question", Object.keys(completeFormDataContext[1]));
     console.log(
