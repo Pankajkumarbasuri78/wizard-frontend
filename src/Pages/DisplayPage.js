@@ -73,9 +73,9 @@ const DisplayPage = () => {
         </div>
         
         {/* {renderDisplay()} */}
-        {/* <br />
+        <br />
         <pre>{JSON.stringify(initialData, null, 2)}</pre>
-        <br /> */}
+        <br />
     </div>
   );
 };

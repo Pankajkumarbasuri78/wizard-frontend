@@ -27,13 +27,13 @@ const TextArea = (props) => {
     });
   };
 
-  const handleDescriptionChange = (e) => {
-    setFormData({ ...formData, textDescription: e.target.value });
-    updateCompleteFormData(formData.Uid, {
-      ...formData,
-      textDescription: e.target.value,
-    });
-  };
+  // const handleDescriptionChange = (e) => {
+  //   setFormData({ ...formData, textDescription: e.target.value });
+  //   updateCompleteFormData(formData.Uid, {
+  //     ...formData,
+  //     textDescription: e.target.value,
+  //   });
+  // };
 
   const updateCompleteFormData = (uid, updatedData) => {
     setId(id + 1);
@@ -99,7 +99,7 @@ const TextArea = (props) => {
             variant="outlined"
             sx={{ mb: 2 }}
           />
-          <TextField
+          {/* <TextField
             label="Text Description"
             fullWidth
             value={formData.textDescription}
@@ -109,7 +109,7 @@ const TextArea = (props) => {
             multiline
             rows={4}
             sx={{ mb: 2 }}
-          />
+          /> */}
           {/* <Button variant="contained" color="primary" type="submit">
             Submit
           </Button> */}
