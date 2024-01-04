@@ -9,6 +9,7 @@ const TextArea = (props) => {
   // Global state,
   const { completeFormDataContext,selectedComponents,setId,setIsValid,id, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
 
+  console.log("textArea props",props);
   // Local state
   const [formData, setFormData] = useState({
     page:currentCount,

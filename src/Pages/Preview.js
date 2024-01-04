@@ -22,10 +22,10 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const PreviewForm = () => {
+
   const { userId } = useParams();
   console.log("preview user id",userId);
-  const { wizardData, completeFormDataContext, setCompleteFormDataContext } =
-    useContext(WizardContext);
+  const { wizardData, completeFormDataContext, setCompleteFormDataContext } = useContext(WizardContext);
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,19 +43,19 @@ const PreviewForm = () => {
       return updatedFormData;
     });
   };
-  const handleDescriptionChange = (questionId, value, page) => {
-    setCompleteFormDataContext((prevFormData) => {
-      const updatedFormData = { ...prevFormData };
-      if (!updatedFormData[page]) {
-        updatedFormData[page] = {};
-      }
-      updatedFormData[page][questionId] = {
-        ...updatedFormData[page][questionId],
-        textDescription: value,
-      };
-      return updatedFormData;
-    });
-  };
+  // const handleDescriptionChange = (questionId, value, page) => {
+  //   setCompleteFormDataContext((prevFormData) => {
+  //     const updatedFormData = { ...prevFormData };
+  //     if (!updatedFormData[page]) {
+  //       updatedFormData[page] = {};
+  //     }
+  //     updatedFormData[page][questionId] = {
+  //       ...updatedFormData[page][questionId],
+  //       textDescription: value,
+  //     };
+  //     return updatedFormData;
+  //   });
+  // };
 
   const handleSubmit = () => {
     const combinedObject = { ...wizardData, completeFormDataContext };
@@ -140,6 +140,59 @@ const PreviewForm = () => {
             />
           </div>
         );
+        case "textarea":
+        return (
+          <div key={questionId} style={{ marginBottom: "20px" }}>
+            <div style={{display:'flex',gap:'5px'}}>
+            <Typography>
+              {questionNo+"."}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {question}
+            </Typography>
+            </div>
+            <TextField
+              label="Text Description"
+              fullWidth
+              multiline
+              rows={4}
+              value={
+                completeFormDataContext[page][questionId]?.answer || ""
+              }
+              onChange={(e) => {
+                handleOptionChange(questionId, e.target.value, page);
+              }}
+              sx={{ mb: 2,marginTop:'10px' }}
+            />
+          </div>
+        );
+
+        // case "textarea":
+        // return (
+        //   <div key={questionId} style={{ marginBottom: "20px" }}>
+        //     <div style={{display:'flex',gap:'5px'}}>
+        //     <Typography>
+        //       {questionNo+"."}
+        //     </Typography>
+        //     <Typography variant="body1" gutterBottom>
+        //       {question}
+        //     </Typography>
+        //     </div>
+        //     <TextField
+        //       label="Text Description"
+        //       fullWidth
+        //       multiline
+        //       rows={4}
+        //       value={
+        //         completeFormDataContext[page][questionId]?.textDescription || ""
+        //       }
+        //       onChange={(e) => {
+        //         handleDescriptionChange(questionId, e.target.value, page);
+        //       }}
+        //       sx={{ mb: 2,marginTop:'10px' }}
+        //     />
+        //   </div>
+        // );
 
       case "dropdown":
         return (
@@ -280,32 +333,7 @@ const PreviewForm = () => {
             </FormControl>
           </div>
         );
-      case "textarea":
-        return (
-          <div key={questionId} style={{ marginBottom: "20px" }}>
-            <div style={{display:'flex',gap:'5px'}}>
-            <Typography>
-              {questionNo+"."}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {question}
-            </Typography>
-            </div>
-            <TextField
-              label="Text Description"
-              fullWidth
-              multiline
-              rows={4}
-              value={
-                completeFormDataContext[page][questionId]?.textDescription || ""
-              }
-              onChange={(e) => {
-                handleDescriptionChange(questionId, e.target.value, page);
-              }}
-              sx={{ mb: 2,marginTop:'10px' }}
-            />
-          </div>
-        );
+      
 
       default:
         return null;

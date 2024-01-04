@@ -285,7 +285,17 @@ const UIPlanning = () => {
                 key={filterData.Uid}
                 uniqueId={filterData.Uid}
                 question={filterData.question}
-                options={filterData.options}
+                // options={filterData.options}
+                answer={filterData.answer}
+              />
+            );
+            case "textarea":
+            return (
+              <TextArea
+                key={filterData.Uid}
+                uniqueId={filterData.Uid}
+                question={filterData.question}
+                // textDescription={filterData.textDescription}
                 answer={filterData.answer}
               />
             );
@@ -324,16 +334,7 @@ const UIPlanning = () => {
               />
             );
 
-          case "textarea":
-            return (
-              <TextArea
-                key={filterData.Uid}
-                uniqueId={filterData.Uid}
-                question={filterData.question}
-                textDescription={filterData.textDescription}
-                answer={filterData.answer}
-              />
-            );
+          
             case "dropdown":
             return (
               <Dropdown
