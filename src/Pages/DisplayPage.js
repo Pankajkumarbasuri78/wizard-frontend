@@ -7,6 +7,7 @@ import Paper from "@mui/material/Paper";
 import axios from "axios";
 
 const DisplayPage = () => {
+  
   const { userId } = useParams();
 
   const {

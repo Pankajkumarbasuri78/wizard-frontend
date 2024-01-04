@@ -22,13 +22,28 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const PreviewForm = () => {
+  const [fieldsCompleted, setFieldsCompleted] = useState(false);
 
   const { userId } = useParams();
-  console.log("preview user id",userId);
-  const { wizardData, completeFormDataContext, setCompleteFormDataContext } = useContext(WizardContext);
+  console.log("preview user id", userId);
+  const { wizardData, completeFormDataContext, setCompleteFormDataContext } =
+    useContext(WizardContext);
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  const checkFieldsCompletion = (formData) => {
+    let allFieldsFilled = true;
+    Object.keys(formData).forEach((page) => {
+      Object.keys(formData[page]).forEach((questionId) => {
+        const answer = formData[page][questionId]?.answer;
+        if (!answer || (Array.isArray(answer) && answer.length === 0)) {
+          allFieldsFilled = false;
+        }
+      });
+    });
+    setFieldsCompleted(allFieldsFilled);
+  };
 
   const handleOptionChange = (questionId, value, page) => {
     setCompleteFormDataContext((prevFormData) => {
@@ -40,6 +55,7 @@ const PreviewForm = () => {
         ...updatedFormData[page][questionId],
         answer: value,
       };
+      checkFieldsCompletion(updatedFormData);
       return updatedFormData;
     });
   };
@@ -76,8 +92,7 @@ const PreviewForm = () => {
         console.log("Error sending data to the backend", error.message);
       });
 
-
-      axios
+    axios
       .post(`http://localhost:8080/saveUserRes/${userId}`, combinedObject, {
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +114,7 @@ const PreviewForm = () => {
     navigate(`/ui/${userId}`);
   };
 
-  const renderQuestion = (questionId, questionData, page,questionNo) => {
+  const renderQuestion = (questionId, questionData, page, questionNo) => {
     console.log("here");
     if (
       !completeFormDataContext ||
@@ -117,19 +132,22 @@ const PreviewForm = () => {
       handleOptionChange(questionId, value, page);
     };
 
+    console.log("questionnumber", questionNo);
+
     switch (type) {
       case "textbox":
         return (
           <div key={questionId} style={{ marginBottom: "20px" }}>
-            <div style={{display:'flex',gap:'5px'}}>
-            <Typography>
-              {questionNo+"."}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {question}
-            </Typography>
+            <div style={{ display: "flex", gap: "5px" }}>
+              <Typography>{questionNo + "."}</Typography>
+              <Typography variant="body1" gutterBottom>
+                {question}
+              </Typography>
             </div>
-            {console.log("textFiled se pehle",completeFormDataContext[page][questionId])}
+            {console.log(
+              "textFiled se pehle",
+              completeFormDataContext[page][questionId]
+            )}
             <TextField
               fullWidth
               variant="outlined"
@@ -140,72 +158,66 @@ const PreviewForm = () => {
             />
           </div>
         );
-        case "textarea":
+      case "textarea":
         return (
           <div key={questionId} style={{ marginBottom: "20px" }}>
-            <div style={{display:'flex',gap:'5px'}}>
-            <Typography>
-              {questionNo+"."}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {question}
-            </Typography>
+            <div style={{ display: "flex", gap: "5px" }}>
+              <Typography>{questionNo + "."}</Typography>
+              <Typography variant="body1" gutterBottom>
+                {question}
+              </Typography>
             </div>
             <TextField
               label="Text Description"
               fullWidth
               multiline
               rows={4}
-              value={
-                completeFormDataContext[page][questionId]?.answer || ""
-              }
+              value={completeFormDataContext[page][questionId]?.answer || ""}
               onChange={(e) => {
                 handleOptionChange(questionId, e.target.value, page);
               }}
-              sx={{ mb: 2,marginTop:'10px' }}
+              sx={{ mb: 2, marginTop: "10px" }}
             />
           </div>
         );
 
-        // case "textarea":
-        // return (
-        //   <div key={questionId} style={{ marginBottom: "20px" }}>
-        //     <div style={{display:'flex',gap:'5px'}}>
-        //     <Typography>
-        //       {questionNo+"."}
-        //     </Typography>
-        //     <Typography variant="body1" gutterBottom>
-        //       {question}
-        //     </Typography>
-        //     </div>
-        //     <TextField
-        //       label="Text Description"
-        //       fullWidth
-        //       multiline
-        //       rows={4}
-        //       value={
-        //         completeFormDataContext[page][questionId]?.textDescription || ""
-        //       }
-        //       onChange={(e) => {
-        //         handleDescriptionChange(questionId, e.target.value, page);
-        //       }}
-        //       sx={{ mb: 2,marginTop:'10px' }}
-        //     />
-        //   </div>
-        // );
+      // case "textarea":
+      // return (
+      //   <div key={questionId} style={{ marginBottom: "20px" }}>
+      //     <div style={{display:'flex',gap:'5px'}}>
+      //     <Typography>
+      //       {questionNo+"."}
+      //     </Typography>
+      //     <Typography variant="body1" gutterBottom>
+      //       {question}
+      //     </Typography>
+      //     </div>
+      //     <TextField
+      //       label="Text Description"
+      //       fullWidth
+      //       multiline
+      //       rows={4}
+      //       value={
+      //         completeFormDataContext[page][questionId]?.textDescription || ""
+      //       }
+      //       onChange={(e) => {
+      //         handleDescriptionChange(questionId, e.target.value, page);
+      //       }}
+      //       sx={{ mb: 2,marginTop:'10px' }}
+      //     />
+      //   </div>
+      // );
 
       case "dropdown":
         return (
           <div key={questionId} style={{ marginBottom: "20px" }}>
-            <div style={{display:'flex',gap:'5px'}}>
-            <Typography>
-              {questionNo+"."}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {question}
-            </Typography>
+            <div style={{ display: "flex", gap: "5px" }}>
+              <Typography>{questionNo + "."}</Typography>
+              <Typography variant="body1" gutterBottom>
+                {question}
+              </Typography>
             </div>
-            <FormControl fullWidth sx={{marginTop:'10px'}}>
+            <FormControl fullWidth sx={{ marginTop: "10px" }}>
               <InputLabel id={`dropdown-label-${questionId}`}>
                 Select an option
               </InputLabel>
@@ -231,13 +243,11 @@ const PreviewForm = () => {
       case "checkbox":
         return (
           <div key={questionId} style={{ marginBottom: "20px" }}>
-            <div style={{display:'flex',gap:'5px'}}>
-            <Typography>
-              {questionNo+"."}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {question}
-            </Typography>
+            <div style={{ display: "flex", gap: "5px" }}>
+              <Typography>{questionNo + "."}</Typography>
+              <Typography variant="body1" gutterBottom>
+                {question}
+              </Typography>
             </div>
             <FormGroup>
               {options.map((option, index) => (
@@ -266,13 +276,11 @@ const PreviewForm = () => {
       case "radio":
         return (
           <div key={questionId} style={{ marginBottom: "20px" }}>
-            <div style={{display:'flex',gap:'5px'}}>
-            <Typography>
-              {questionNo+"."}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {question}
-            </Typography>
+            <div style={{ display: "flex", gap: "5px" }}>
+              <Typography>{questionNo + "."}</Typography>
+              <Typography variant="body1" gutterBottom>
+                {question}
+              </Typography>
             </div>
             <RadioGroup
               value={completeFormDataContext[page][questionId]?.answer || ""}
@@ -295,15 +303,13 @@ const PreviewForm = () => {
       case "mcq":
         return (
           <div key={questionId} style={{ marginBottom: "20px" }}>
-            <div style={{display:'flex',gap:'5px'}}>
-            <Typography>
-              {questionNo+"."}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {question}
-            </Typography>
+            <div style={{ display: "flex", gap: "5px" }}>
+              <Typography>{questionNo + "."}</Typography>
+              <Typography variant="body1" gutterBottom>
+                {question}
+              </Typography>
             </div>
-            <FormControl fullWidth sx={{marginTop:'10px'}}>
+            <FormControl fullWidth sx={{ marginTop: "10px" }}>
               <InputLabel id={`multiselect-label-${questionId}`}>
                 Select multiple options
               </InputLabel>
@@ -333,11 +339,11 @@ const PreviewForm = () => {
             </FormControl>
           </div>
         );
-      
 
       default:
         return null;
     }
+    // setQuestionCount(questionNo);
   };
 
   const arrayOfPages = Object.keys(completeFormDataContext).map((page) =>
@@ -380,7 +386,7 @@ const PreviewForm = () => {
   //   console.log(currentPage ===  arrayOfPages[arrayOfPages.length-1]);
   //   console.log("firsttttt",arrayOfPages[0]);
   // },[currentPage])
-  
+
   useEffect(() => {
     console.log("all question", Object.keys(completeFormDataContext[1]));
     console.log(
@@ -394,7 +400,7 @@ const PreviewForm = () => {
       <div className="user_form">
         <div className="user_form_section">
           {/* <div style={{display:'flex',justifyContent:'center',alignItems:'center',padding:'10px',fontFamily:'sans-serif',fontSize:'larger',fontWeight:'bold'}}>{wizardData.title}</div> */}
-          
+
           {Object.keys(completeFormDataContext).map((page) => {
             const pageNumber = parseInt(page, 10);
             console.log("pageNumber", pageNumber);
@@ -410,15 +416,32 @@ const PreviewForm = () => {
 
             return (
               <Paper elevation={8}>
-                 <div style={{display:'flex',justifyContent:'center',alignItems:'center',paddingTop:'20px',fontFamily:'sans-serif',fontSize:'larger',fontWeight:'bold'}}>{wizardData.title}</div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingTop: "20px",
+                    fontFamily: "sans-serif",
+                    fontSize: "larger",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {wizardData.title}
+                </div>
                 <div key={`page-${page}`} className="user_form_questions">
-                  {questions.map((questionId,index) => (
+                  <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
+                    {"PAGE " + pageNumber}
+                  </div>
+
+                  {questions.map((questionId, index) => (
                     <div key={`question-${questionId}`}>
                       {console.log("question not map", questionId)}
                       {renderQuestion(
                         questionId,
                         completeFormDataContext[page][questionId],
-                        page,index+1
+                        page,
+                        index + 1
                       )}
                     </div>
                   ))}
@@ -439,14 +462,25 @@ const PreviewForm = () => {
                       Prev
                     </Button>
 
-                    <Button
+                    {currentPage === arrayOfPages[arrayOfPages.length - 1] && (
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={handleSubmit}
+                        disabled={!fieldsCompleted}
+                      >
+                        Submit
+                      </Button>
+                    )}
+
+                    {/* <Button
                       variant="outlined"
                       color="primary"
                       onClick={handleSubmit}
                       disabled={!handleNextDisable()}
                     >
                       Submit
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="outlined"
                       color="primary"
