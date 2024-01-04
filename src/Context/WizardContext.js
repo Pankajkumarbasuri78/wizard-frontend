@@ -62,6 +62,8 @@ const WizardContextProvider = ({ children }) => {
 
   const [isValid,setIsValid] = useState(false);
 
+  const [userNAME,setUserNAME] = useState('');
+
   // const userId
 
   
@@ -82,7 +84,8 @@ const WizardContextProvider = ({ children }) => {
     currentCount,
     setCurrentCount,
     id,setId,
-    isValid,setIsValid
+    isValid,setIsValid,
+    userNAME,setUserNAME
     
   };
 

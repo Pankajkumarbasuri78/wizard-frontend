@@ -22,15 +22,20 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const PreviewForm = () => {
+
+  const { wizardData, completeFormDataContext, setCompleteFormDataContext,userNAME } =
+  useContext(WizardContext);
+
   const [fieldsCompleted, setFieldsCompleted] = useState(false);
+  const [userName, setUserName] = useState(userNAME || '');
+  const [currentPage, setCurrentPage] = useState(0);
 
   const { userId } = useParams();
   console.log("preview user id", userId);
-  const { wizardData, completeFormDataContext, setCompleteFormDataContext } =
-    useContext(WizardContext);
+ 
   const navigate = useNavigate();
 
-  const [currentPage, setCurrentPage] = useState(1);
+  
 
   const checkFieldsCompletion = (formData) => {
     let allFieldsFilled = true;
@@ -59,6 +64,11 @@ const PreviewForm = () => {
       return updatedFormData;
     });
   };
+
+  const handleUserNameChange = (e) => {
+    setUserName(e.target.value);
+    console.log("userName",userName);
+  };
   // const handleDescriptionChange = (questionId, value, page) => {
   //   setCompleteFormDataContext((prevFormData) => {
   //     const updatedFormData = { ...prevFormData };
@@ -72,6 +82,12 @@ const PreviewForm = () => {
   //     return updatedFormData;
   //   });
   // };
+
+  const handleUserNameNext = () => {
+    if (userName.trim() !== '') {
+      setCurrentPage(1); // Move to the next page (page 1 with questions)
+    }
+  };
 
   const handleSubmit = () => {
     const combinedObject = { ...wizardData, completeFormDataContext };
@@ -93,7 +109,7 @@ const PreviewForm = () => {
       });
 
     axios
-      .post(`http://localhost:8080/saveUserRes/${userId}/pankaj`, combinedObject, {
+      .post(`http://localhost:8080/saveUserRes/${userId}/${userName}`, combinedObject, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -380,6 +396,50 @@ const PreviewForm = () => {
     return currentPage === arrayOfPages[arrayOfPages.length - 1];
   };
 
+  // const renderUserNamePage = () => {
+  //   if (currentPage !== 1) {
+  //     return null;
+  //   }
+  const renderUserNamePage = () => {
+    if (currentPage !== 0) {
+      return null;
+    }
+
+    return (
+      <Paper elevation={8}>
+        <div className="user_form_questions">
+          <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
+            {"PAGE " + currentPage}
+          </div>
+
+          <div key="question-userName">
+            <div>
+              <Typography variant="body1" gutterBottom>
+                Enter Your Name:
+              </Typography>
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={userName}
+                onChange={handleUserNameChange}
+              />
+            </div>
+          </div>
+          <div style={{ marginTop: "20px" }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleNextPage}
+              disabled={!userName}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      </Paper>
+    );
+  };
+
   // useEffect(()=>{
   //   console.log("useCurrentpage",currentPage);
   //   console.log("array",arrayOfPages[arrayOfPages.length-1]);
@@ -394,114 +454,121 @@ const PreviewForm = () => {
       Object.values(completeFormDataContext[1])
     );
   }, []);
+  useEffect(()=>{
+    if(userNAME && userName!==userNAME){
+      setUserName(userNAME)
+    }
+  },[userNAME])
 
   return (
     <div className="submit">
       <div className="user_form">
         <div className="user_form_section">
+        {renderUserNamePage()}
           {/* <div style={{display:'flex',justifyContent:'center',alignItems:'center',padding:'10px',fontFamily:'sans-serif',fontSize:'larger',fontWeight:'bold'}}>{wizardData.title}</div> */}
-
-          {Object.keys(completeFormDataContext).map((page) => {
-            const pageNumber = parseInt(page, 10);
-            console.log("pageNumber", pageNumber);
-            if (pageNumber !== currentPage) {
-              console.log("yyyy");
-              return null;
-            }
-
-            const questions = Object.keys(completeFormDataContext[page]);
-            if (questions.length === 0) {
-              return null;
-            }
-
-            return (
-              <Paper elevation={8}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    paddingTop: "20px",
-                    fontFamily: "sans-serif",
-                    fontSize: "larger",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {wizardData.title}
-                </div>
-                <div key={`page-${page}`} className="user_form_questions">
-                  <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
-                    {"PAGE " + pageNumber}
-                  </div>
-
-                  {questions.map((questionId, index) => (
-                    <div key={`question-${questionId}`}>
-                      {console.log("question not map", questionId)}
-                      {renderQuestion(
-                        questionId,
-                        completeFormDataContext[page][questionId],
-                        page,
-                        index + 1
-                      )}
-                    </div>
-                  ))}
+          {currentPage !== 0 && 
+            Object.keys(completeFormDataContext).map((page) => {
+              const pageNumber = parseInt(page, 10);
+              console.log("pageNumber", pageNumber);
+              if (pageNumber !== currentPage) {
+                console.log("yyyy");
+                return null;
+              }
+  
+              const questions = Object.keys(completeFormDataContext[page]);
+              if (questions.length === 0) {
+                return null;
+              }
+  
+              return (
+                <Paper elevation={8}>
                   <div
                     style={{
                       display: "flex",
-                      gap: 20,
-                      justifyContent: "space-between",
-                      marginTop: "20px",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingTop: "20px",
+                      fontFamily: "sans-serif",
+                      fontSize: "larger",
+                      fontWeight: "bold",
                     }}
                   >
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={handlePreviousPage}
-                      disabled={handlePrevDisable()}
+                    {wizardData.title}
+                  </div>
+                  <div key={`page-${page}`} className="user_form_questions">
+                    <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
+                      {"PAGE " + pageNumber}
+                    </div>
+  
+                    {questions.map((questionId, index) => (
+                      <div key={`question-${questionId}`}>
+                        {console.log("question not map", questionId)}
+                        {renderQuestion(
+                          questionId,
+                          completeFormDataContext[page][questionId],
+                          page,
+                          index + 1
+                        )}
+                      </div>
+                    ))}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 20,
+                        justifyContent: "space-between",
+                        marginTop: "20px",
+                      }}
                     >
-                      Prev
-                    </Button>
-
-                    {currentPage === arrayOfPages[arrayOfPages.length - 1] && (
                       <Button
                         variant="outlined"
                         color="primary"
+                        onClick={handlePreviousPage}
+                        disabled={handlePrevDisable()}
+                      >
+                        Prev
+                      </Button>
+  
+                      {currentPage === arrayOfPages[arrayOfPages.length - 1] && (
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={handleSubmit}
+                          disabled={!fieldsCompleted}
+                        >
+                          Submit
+                        </Button>
+                      )}
+  
+                      {/* <Button
+                        variant="outlined"
+                        color="primary"
                         onClick={handleSubmit}
-                        disabled={!fieldsCompleted}
+                        disabled={!handleNextDisable()}
                       >
                         Submit
+                      </Button> */}
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={handleBack}
+                      >
+                        Back
                       </Button>
-                    )}
-
-                    {/* <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleSubmit}
-                      disabled={!handleNextDisable()}
-                    >
-                      Submit
-                    </Button> */}
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleBack}
-                    >
-                      Back
-                    </Button>
-
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleNextPage}
-                      disabled={handleNextDisable()}
-                    >
-                      Next
-                    </Button>
+  
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={handleNextPage}
+                        disabled={handleNextDisable()}
+                      >
+                        Next
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Paper>
-            );
-          })}
+                </Paper>
+              );
+            })}
+          
         </div>
       </div>
     </div>
