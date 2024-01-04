@@ -93,7 +93,7 @@ const PreviewForm = () => {
       });
 
     axios
-      .post(`http://localhost:8080/saveUserRes/${userId}`, combinedObject, {
+      .post(`http://localhost:8080/saveUserRes/${userId}/pankaj`, combinedObject, {
         headers: {
           "Content-Type": "application/json",
         },
