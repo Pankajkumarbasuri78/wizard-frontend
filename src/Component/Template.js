@@ -30,11 +30,15 @@ const Template = () => {
     getDataFrombackend();
   }, []);
 
+  
+
   const handleData = (wizard,i) =>{
     const data = JSON.parse(wizard.jsonData);
     console.log("wizarddatattatattata",data);
     return data.title;
   }
+
+  
   return (
     <div className="templateLayout">
       <div className="templateWrapper">

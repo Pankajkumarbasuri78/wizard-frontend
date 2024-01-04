@@ -31,6 +31,7 @@ const CardComp = ({ title, id,title1 }) => {
     }
   };
 
+
   return (
     <Card sx={{ minWidth: 275, margin: "20px 0" }}>
       <CardContent sx={{ textAlign: "center" }}>
@@ -47,8 +48,10 @@ const CardComp = ({ title, id,title1 }) => {
           <Avatar
             sx={{ bgcolor: grey[300], height: 100, width: 100 }}
             variant="rounded"
+
           >
             <AssignmentIcon sx={{ fontSize: 60 }} />
+            
           </Avatar>
         </Box>
       </CardContent>
@@ -56,6 +59,7 @@ const CardComp = ({ title, id,title1 }) => {
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
       >
         <div style={{display:'flex',flexDirection:'column'}}>
+        
         <Button
           sx={{
             display: "block",
@@ -67,8 +71,10 @@ const CardComp = ({ title, id,title1 }) => {
           onClick={() => handleData(id)}
         >
           {title1}{" "}{title}{" "}
+          
         </Button>
-        <Button
+        
+        {/* <Button
           sx={{
             display: "block",
             overflow: "hidden",
@@ -79,9 +85,12 @@ const CardComp = ({ title, id,title1 }) => {
           onClick={() => handleData(id)}
         >
           Data Collected
-        </Button>
+        </Button> */}
         </div>
+       
+        
       </CardActions>
+      
     </Card>
   );
 };
