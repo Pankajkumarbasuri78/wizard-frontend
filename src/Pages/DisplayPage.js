@@ -303,9 +303,30 @@ const DisplayPage = () => {
     }
   };
 
-  // const handleEditNew = () => {
-  //   navigate(`/ui/${userId}`);
-  // }
+  const handleEditForm = () => {
+    const singleForm = resData.find(
+      (item) => item.wizardId === parseInt(userId, 10)
+    );
+    // console.log("singleForm",singleForm);
+    if (singleForm) {
+      const jsonSingleForm = JSON.parse(singleForm.jsonDataResponse);
+      const { completeFormDataContext } = jsonSingleForm;
+      // assigning a globalobject here
+      const newCompleteFormDataContext = {};
+      // completeFormDataContext is an object
+      Object.entries(completeFormDataContext).forEach(([page, components]) => {
+        // traversing that object
+        const newPageObject = {};
+        Object.entries(components).forEach(([key, value]) => {
+          const answerRemoved = { ...value, answer: "" };
+          newPageObject[key] = answerRemoved;
+        });
+        newCompleteFormDataContext[page] = newPageObject;
+      });
+      setCompleteFormDataContext(newCompleteFormDataContext);
+      navigate(`/ui/${userId}`);
+    }
+  }
 
   const handleDelete = async (userId) => {
     try {
@@ -330,7 +351,7 @@ const DisplayPage = () => {
 
   console.log("16's data", perticularResData);
 
-  const handleResData = async (id) => {
+  const handleViewData = async (id) => {
     try {
       const res = await axios.get(`http://localhost:8080/getDataRes/${id}`);
 
@@ -394,12 +415,6 @@ const DisplayPage = () => {
       description: initialData.description,
       totalSteps: initialData.totalSteps,
     });
-
-    // setWizardData({
-    //   title: currIdData.title,
-    //   description: currIdData.description,
-    //   totalSteps: currIdData.totalSteps,
-    // });
     getResponseData();
   }, []);
 
@@ -447,6 +462,14 @@ const DisplayPage = () => {
             variant="outlined"
             color="success"
             className="buttonClass"
+            onClick={handleEditForm}
+          >
+            EDIT
+          </Button>
+          <Button
+            variant="outlined"
+            color="success"
+            className="buttonClass"
             onClick={() => navigate("/")}
           >
             Back
@@ -488,7 +511,7 @@ const DisplayPage = () => {
                     <TableCell align="right">
                       <Tooltip title="view">
                         <FullscreenSharpIcon
-                          onClick={() => handleResData(row.id)}
+                          onClick={() => handleViewData(row.id)}
                         />
                       </Tooltip>
                     </TableCell>
