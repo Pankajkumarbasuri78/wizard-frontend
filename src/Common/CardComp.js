@@ -74,18 +74,6 @@ const CardComp = ({ title, id,title1 }) => {
           
         </Button>
         
-        {/* <Button
-          sx={{
-            display: "block",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            maxWidth: "250px",
-            textOverflow: "ellipsis",
-          }}
-          onClick={() => handleData(id)}
-        >
-          Data Collected
-        </Button> */}
         </div>
        
         

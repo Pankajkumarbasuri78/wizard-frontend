@@ -256,7 +256,7 @@ const UIPlanning = () => {
     }
   }
   else{
-    console.log("validate karo");
+    // console.log("validate karo");
         toast.warning("Give proper Validation!!!", {
           autoClose: 1000,
         });

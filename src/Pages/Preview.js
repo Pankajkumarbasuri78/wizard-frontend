@@ -22,20 +22,26 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const PreviewForm = () => {
-
-  const { wizardData, completeFormDataContext, setCompleteFormDataContext,userNAME } =
-  useContext(WizardContext);
+  const {
+    wizardData,
+    completeFormDataContext,
+    setCompleteFormDataContext,
+    userNAME,
+  } = useContext(WizardContext);
 
   const [fieldsCompleted, setFieldsCompleted] = useState(false);
-  const [userName, setUserName] = useState(userNAME || '');
+  const [userName, setUserName] = useState(userNAME || "");
   const [currentPage, setCurrentPage] = useState(0);
+
+  const [userNameError, setUserNameError] = useState("");
+
+  const [email, setEmail] = useState('');
+const [emailError, setEmailError] = useState('');
 
   const { userId } = useParams();
   console.log("preview user id", userId);
- 
-  const navigate = useNavigate();
 
-  
+  const navigate = useNavigate();
 
   const checkFieldsCompletion = (formData) => {
     let allFieldsFilled = true;
@@ -65,9 +71,47 @@ const PreviewForm = () => {
     });
   };
 
-  const handleUserNameChange = (e) => {
+  let typingTimeout;
+
+  const handleUserNameChange = async (e) => {
     setUserName(e.target.value);
-    console.log("userName",userName);
+    // Clear the previous timeout
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    // Set a new timeout
+    typingTimeout = setTimeout(async () => {
+      try {
+        const resUser = await axios.post(
+          `http://localhost:8080/checkUserRes/${userId}/${e.target.value}`
+        );
+
+        if (resUser.data === "user found") {
+          setUserNameError("Username already exits.Please give another.");
+        } else {
+          setUserNameError("");
+        }
+        // console.log("response user name", resUser.data);
+      } catch (error) {}
+    }, 800);
+
+    console.log("userName", userName);
+  };
+
+  const handleEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+  
+    // Perform email validation
+    const emailRegex = /^[a-zA-Z0-9._-]+@[gmail]+\.[com]{3}$/ ; 
+    const isValidEmail = emailRegex.test(newEmail);
+  
+    if (!isValidEmail) {
+      setEmailError('Please enter a valid email address.');
+    } else {
+      setEmailError('');
+    }
   };
   // const handleDescriptionChange = (questionId, value, page) => {
   //   setCompleteFormDataContext((prevFormData) => {
@@ -82,12 +126,6 @@ const PreviewForm = () => {
   //     return updatedFormData;
   //   });
   // };
-
-  const handleUserNameNext = () => {
-    if (userName.trim() !== '') {
-      setCurrentPage(1); // Move to the next page (page 1 with questions)
-    }
-  };
 
   const handleSubmit = () => {
     const combinedObject = { ...wizardData, completeFormDataContext };
@@ -109,11 +147,15 @@ const PreviewForm = () => {
       });
 
     axios
-      .post(`http://localhost:8080/saveUserRes/${userId}/${userName}`, combinedObject, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      .post(
+        `http://localhost:8080/saveUserRes/${userId}/${userName}`,
+        combinedObject,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
       .then((response) => {
         console.log(
           "Data sent to the backend successfully with answer",
@@ -130,6 +172,7 @@ const PreviewForm = () => {
     navigate(`/ui/${userId}`);
   };
 
+  //render question----------
   const renderQuestion = (questionId, questionData, page, questionNo) => {
     console.log("here");
     if (
@@ -400,6 +443,11 @@ const PreviewForm = () => {
   //   if (currentPage !== 1) {
   //     return null;
   //   }
+
+  const isPage0Valid = () => {
+    return !userNameError && !emailError && userName && email;
+  };
+  //render Page 0-------------
   const renderUserNamePage = () => {
     if (currentPage !== 0) {
       return null;
@@ -423,14 +471,44 @@ const PreviewForm = () => {
                 value={userName}
                 onChange={handleUserNameChange}
               />
+              {userNameError && (
+                <div
+                  style={{ color: "red", marginTop: "2px", fontSize: "15px" }}
+                >
+                  {userNameError}
+                </div>
+              )}
             </div>
           </div>
+
+          <div key="question-email">
+            <div>
+              <Typography variant="body1" gutterBottom>
+                Enter Your Email:
+              </Typography>
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={email}
+                onChange={handleEmailChange}
+              />
+              {emailError && (
+                <div
+                  style={{ color: "red", marginTop: "2px", fontSize: "15px" }}
+                >
+                  {emailError}
+                </div>
+              )}
+            </div>
+          </div>
+
           <div style={{ marginTop: "20px" }}>
             <Button
               variant="outlined"
               color="primary"
               onClick={handleNextPage}
-              disabled={!userName}
+              // disabled={!userName}
+              disabled={!isPage0Valid()}
             >
               Next
             </Button>
@@ -454,19 +532,21 @@ const PreviewForm = () => {
       Object.values(completeFormDataContext[1])
     );
   }, []);
-  useEffect(()=>{
-    if(userNAME && userName!==userNAME){
-      setUserName(userNAME)
+  useEffect(() => {
+    if (userNAME && userName !== userNAME) {
+      setUserName(userNAME);
     }
-  },[userNAME])
+  }, [userNAME]);
 
   return (
     <div className="submit">
       <div className="user_form">
         <div className="user_form_section">
-        {renderUserNamePage()}
+          {renderUserNamePage()}
+
           {/* <div style={{display:'flex',justifyContent:'center',alignItems:'center',padding:'10px',fontFamily:'sans-serif',fontSize:'larger',fontWeight:'bold'}}>{wizardData.title}</div> */}
-          {currentPage !== 0 && 
+
+          {currentPage !== 0 &&
             Object.keys(completeFormDataContext).map((page) => {
               const pageNumber = parseInt(page, 10);
               console.log("pageNumber", pageNumber);
@@ -474,12 +554,12 @@ const PreviewForm = () => {
                 console.log("yyyy");
                 return null;
               }
-  
+
               const questions = Object.keys(completeFormDataContext[page]);
               if (questions.length === 0) {
                 return null;
               }
-  
+
               return (
                 <Paper elevation={8}>
                   <div
@@ -499,7 +579,7 @@ const PreviewForm = () => {
                     <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
                       {"PAGE " + pageNumber}
                     </div>
-  
+
                     {questions.map((questionId, index) => (
                       <div key={`question-${questionId}`}>
                         {console.log("question not map", questionId)}
@@ -527,8 +607,9 @@ const PreviewForm = () => {
                       >
                         Prev
                       </Button>
-  
-                      {currentPage === arrayOfPages[arrayOfPages.length - 1] && (
+
+                      {currentPage ===
+                        arrayOfPages[arrayOfPages.length - 1] && (
                         <Button
                           variant="outlined"
                           color="primary"
@@ -538,7 +619,7 @@ const PreviewForm = () => {
                           Submit
                         </Button>
                       )}
-  
+
                       {/* <Button
                         variant="outlined"
                         color="primary"
@@ -554,7 +635,7 @@ const PreviewForm = () => {
                       >
                         Back
                       </Button>
-  
+
                       <Button
                         variant="outlined"
                         color="primary"
@@ -568,7 +649,6 @@ const PreviewForm = () => {
                 </Paper>
               );
             })}
-          
         </div>
       </div>
     </div>
