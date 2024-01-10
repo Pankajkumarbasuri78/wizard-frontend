@@ -337,6 +337,15 @@ console.log("handleOptionChange",validateSettings,"questionid",questionId,"page"
                 ))}
               </Select>
             </FormControl>
+            {validateSettings?.isRequired &&
+                !options.some(
+                  (option) =>
+                    completeFormDataContext[page][questionId]?.answer === option
+                ) && (
+                  <div style={{ color: "red", marginTop: "3px",fontSize:'13px' }}>
+                    This field is required.
+                  </div>
+                )}
           </div>
         );
 
@@ -411,6 +420,15 @@ console.log("handleOptionChange",validateSettings,"questionid",questionId,"page"
                 />
               ))}
             </RadioGroup>
+            {validateSettings?.isRequired &&
+                !options.some(
+                  (option) =>
+                    completeFormDataContext[page][questionId]?.answer === option
+                ) && (
+                  <div style={{ color: "red", marginTop: "3px",fontSize:'13px' }}>
+                    This field is required.
+                  </div>
+                )}
           </div>
         );
 
@@ -451,6 +469,15 @@ console.log("handleOptionChange",validateSettings,"questionid",questionId,"page"
                 ))}
               </Select>
             </FormControl>
+            {validateSettings?.isRequired &&
+                !options.some(
+                  (option) =>
+                    completeFormDataContext[page][questionId]?.answer === option
+                ) && (
+                  <div style={{ color: "red", marginTop: "3px",fontSize:'13px' }}>
+                    This field is required.
+                  </div>
+                )}
           </div>
         );
 

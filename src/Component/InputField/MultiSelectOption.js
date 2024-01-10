@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Typography, TextField, Button, FormControl, Box, IconButton } from '@mui/material';
+import { Typography, TextField, Button, FormControl, Box, IconButton,FormControlLabel,Modal,Checkbox } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import '../../CSS/textboxes.css';
 import { WizardContext } from '../../Context/WizardContext';
@@ -7,6 +7,14 @@ import { WizardContext } from '../../Context/WizardContext';
 const MultiSelectOption = (props) => {
 
   const [errors,setErrors] = useState({});
+
+  const [isRequired, setIsRequired] = useState(false);
+  const [validationModalOpen, setValidationModalOpen] = useState(false);
+  const [validationSettings, setValidationSettings] = useState({
+    regexPattern: "",
+    maxLength: "",
+    isRequired: false,
+  });
 
   //global state
   const {completeFormDataContext,setId,id,setIsValid,selectedComponents,setCompleteFormDataContext,globalSeq,setGlobalSeq,currentCount} = useContext(WizardContext)
@@ -129,6 +137,32 @@ const MultiSelectOption = (props) => {
     });
   };
 
+  const handleRequiredToggle = () => {
+    setIsRequired(!isRequired);
+
+    setValidationSettings({ ...validationSettings, isRequired: !isRequired });
+  };
+
+  const handleValidationModalOpen = () => {
+    setValidationModalOpen(true);
+  };
+
+  const handleValidationModalClose = () => {
+    setValidationModalOpen(false);
+  };
+
+  const handleSaveValidationSettings = () => {
+    updateCompleteFormData(formData.Uid, {
+      ...formData,
+      validationSettings: {
+        ...validationSettings,
+        isRequired: isRequired,
+      },
+    });
+
+    setValidationModalOpen(false);
+  };
+
   const updateCompleteFormData = (uid, updatedData) => {
     setId(id + 1);
     console.log("id", id);
@@ -182,7 +216,6 @@ const MultiSelectOption = (props) => {
           </Button> */}
         </div>
 
-        <FormControl component="fieldset" sx={{ mb: 4, mt: 2 }}>
           {formData.options.map((option, index) => (
             <div key={index} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: '8px', backgroundColor: '#ffffff', boxShadow: '0px 3px 6px #00000029', borderRadius: '8px', padding: '8px' }}>
               <TextField
@@ -200,17 +233,63 @@ const MultiSelectOption = (props) => {
               </IconButton>
             </div>
           ))}
-          <Button
+          <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+        <Button
+          variant="outlined"
+          onClick={addOption}
+          disabled={formData.options.length === 4}
+          sx={{ mt: 2 }}
+          fullWidth
+          // style={{ width: 150 }}
+        >
+          Add Option
+        </Button>
+        <Button
             variant="outlined"
-            onClick={addOption}
-            disabled={formData.options.length === 4}
-            sx={{ mt: 2 }}
-            style={{width:150}}
+            color="primary"
+            onClick={handleValidationModalOpen}
+            style={{height:'30px'}}
           >
-            Add Option
+            Client Side Validation
           </Button>
-        </FormControl>
+          </div>
       </form>
+
+
+      <Modal
+        open={validationModalOpen}
+        onClose={handleValidationModalClose}
+        aria-labelledby="validation-modal-title"
+        aria-describedby="validation-modal-description"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box sx={{ width: 300, bgcolor: "background.paper", p: 3 }}>
+          <h3 style={{ paddingBottom: "10px" }} id="validation-modal-title">
+            Validation Settings
+          </h3>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isRequired}
+                onChange={handleRequiredToggle}
+                color="primary"
+              />
+            }
+            label="Required"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveValidationSettings}
+          >
+            Save
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useContext,useEffect } from 'react';
-import { Typography, TextField, Button, Box, IconButton } from '@mui/material';
+import { Typography, TextField, Button, Box, IconButton,FormControlLabel,Modal,Checkbox } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { WizardContext } from '../../Context/WizardContext';
 
@@ -8,6 +8,13 @@ const Dropdown = (props) => {
   // Global state
   const { completeFormDataContext,selectedComponents, setCompleteFormDataContext,setIsValid,currentCount,id,setId } = useContext(WizardContext);
 
+  const [isRequired, setIsRequired] = useState(false);
+  const [validationModalOpen, setValidationModalOpen] = useState(false);
+  const [validationSettings, setValidationSettings] = useState({
+    regexPattern: "",
+    maxLength: "",
+    isRequired: false,
+  });
   // Local state
   const [formData, setFormData] = useState({
     page:currentCount,
@@ -116,6 +123,32 @@ const Dropdown = (props) => {
     })
   };
 
+  const handleRequiredToggle = () => {
+    setIsRequired(!isRequired);
+
+    setValidationSettings({ ...validationSettings, isRequired: !isRequired });
+  };
+
+  const handleValidationModalOpen = () => {
+    setValidationModalOpen(true);
+  };
+
+  const handleValidationModalClose = () => {
+    setValidationModalOpen(false);
+  };
+
+  const handleSaveValidationSettings = () => {
+    updateCompleteFormData(formData.Uid, {
+      ...formData,
+      validationSettings: {
+        ...validationSettings,
+        isRequired: isRequired,
+      },
+    });
+
+    setValidationModalOpen(false);
+  };
+
   const updateCompleteFormData = (uid, updatedData) => {
     setId(id+1);
     if(uid){
@@ -177,17 +210,64 @@ const Dropdown = (props) => {
               </IconButton>
             </div>
           ))}
-          <Button
+          <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+        <Button
+          variant="outlined"
+          onClick={addOption}
+          disabled={formData.options.length === 4}
+          sx={{ mt: 2 }}
+          fullWidth
+          // style={{ width: 150 }}
+        >
+          Add Option
+        </Button>
+        <Button
             variant="outlined"
-            onClick={addOption}
-            disabled={formData.options.length === 4}
-            sx={{ mt: 2 }}
-            style={{width:150}}
+            color="primary"
+            onClick={handleValidationModalOpen}
+            style={{height:'30px'}}
           >
-            Add Option
+            Client Side Validation
           </Button>
+          </div>
         </div>
       </form>
+
+
+      <Modal
+        open={validationModalOpen}
+        onClose={handleValidationModalClose}
+        aria-labelledby="validation-modal-title"
+        aria-describedby="validation-modal-description"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box sx={{ width: 300, bgcolor: "background.paper", p: 3 }}>
+          <h3 style={{ paddingBottom: "10px" }} id="validation-modal-title">
+            Validation Settings
+          </h3>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isRequired}
+                onChange={handleRequiredToggle}
+                color="primary"
+              />
+            }
+            label="Required"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveValidationSettings}
+          >
+            Save
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 };
