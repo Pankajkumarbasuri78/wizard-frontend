@@ -1,8 +1,17 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Typography, TextField, Box } from '@mui/material';
+import { Typography, TextField, Box ,Button,Modal,FormControlLabel,Checkbox} from '@mui/material';
 import { WizardContext } from '../../Context/WizardContext';
 
 const TextArea = (props) => {
+
+  const [isRequired,setIsRequired] = useState(false);
+  const [validationModalOpen,setValidationModalOpen] = useState(false);
+
+  const [validationSettings, setValidationSettings] = useState({
+    regexPattern:"",
+    maxLength:10,
+    isRequired:false,
+  })
 
   const [errors,setErrors] = useState({});
 
@@ -59,7 +68,58 @@ const TextArea = (props) => {
 
     //validate question
     setIsValid(validateTextAreaForm({question : e.target.value}));
+
   };
+
+  const handleRequiredToggle = () => {
+    setIsRequired(!isRequired);
+
+    setValidationSettings({...validationSettings,isRequired:!isRequired})
+
+  }
+
+  const handleValidationModalOpen = () => {
+    setValidationModalOpen(true)
+  }
+  const handleValidationModalClose = () => {
+    setValidationModalOpen(false);
+  };
+
+  const handleValidationInputChange = (e) => {
+    setValidationSettings({
+      ...validationSettings,
+      maxLength:e.target.value,
+    })
+  }
+
+  const checkRegex = (newRegexPattern) => {
+
+    try {
+      new RegExp(newRegexPattern);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  const handleRegexChange = (e) => {
+    const newRegexPattern = e.target.value;
+    let regexError = "";
+    if(checkRegex(newRegexPattern)){
+
+      setValidationSettings({
+        ...validationSettings,
+        regexPattern: e.target.value,
+      })
+    }
+    else{
+      regexError="Invalid regex pattern";
+    }
+
+    setErrors({...errors,regex:regexError});
+  }
+
+ 
 
   const updateCompleteFormData = (uid, updatedData) => {
     setId(id + 1);
@@ -74,6 +134,18 @@ const TextArea = (props) => {
         [uid]: updatedData,
       },
     }));
+  };
+  
+  const handleSaveValidationSettings = () => {
+    updateCompleteFormData(formData.Uid, {
+      ...formData,
+      validationSettings: {
+        ...validationSettings,
+        isRequired: isRequired,
+      },
+    });
+
+    setValidationModalOpen(false);
   };
 
   useEffect(() => {
@@ -136,8 +208,71 @@ const TextArea = (props) => {
             error={Boolean(errors.question)}
             helperText={errors.question}
           />
+          <Button
+          variant='outlined'
+          color='primary'
+          onClick={handleValidationModalOpen}
+          >
+            Client Side Validation
+          </Button>
         </div>
       </form>
+
+      {/* modal */}
+      <Modal
+       open={validationModalOpen}
+       onClose={handleValidationModalClose}
+       aria-labelledby="validation-modal-title"
+       aria-describedby="validation-modal-description"
+       style={{
+         display: "flex",
+         alignItems: "center",
+         justifyContent: "center",
+       }}
+      >
+
+<Box sx={{ width: 300, bgcolor: "background.paper", p: 3 }}>
+          <h3 style={{ paddingBottom: "10px" }} id="validation-modal-title">
+            Validation Settings
+          </h3>
+          <TextField
+            label="Max Length"
+            name="maxLength"
+            value={validationSettings.maxLength}
+            onChange={handleValidationInputChange}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Regex Pattern"
+            variant="outlined"
+            fullWidth
+            value={validationSettings.regexPattern}
+            onChange={handleRegexChange}
+            sx={{ mt: 2 }}
+            error={Boolean(errors.regex)}
+            helperText={errors.regex}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isRequired}
+                onChange={handleRequiredToggle}
+                color="primary"
+              />
+            }
+            label="Required"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveValidationSettings}
+          >
+            Save
+          </Button>
+        </Box>
+
+      </Modal>
     </Box>
   );
 };

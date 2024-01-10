@@ -20,6 +20,8 @@ import { useNavigate } from "react-router-dom";
 import { WizardContext } from "../Context/WizardContext";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
 
 const PreviewForm = () => {
   const {
@@ -33,10 +35,20 @@ const PreviewForm = () => {
   const [userName, setUserName] = useState(userNAME || "");
   const [currentPage, setCurrentPage] = useState(0);
 
+  //store all errors
+  const [fieldErrors, setFieldErrors] = useState({});
+
+
   const [userNameError, setUserNameError] = useState("");
 
-  const [email, setEmail] = useState('');
-const [emailError, setEmailError] = useState('');
+  //check if errors available
+  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
+
+
+  
+
+  const [showModal, setShowModal] = useState(false);
+  const [apiEndpoint, setApiEndpoint] = useState("null");
 
   const { userId } = useParams();
   console.log("preview user id", userId);
@@ -48,15 +60,54 @@ const [emailError, setEmailError] = useState('');
     Object.keys(formData).forEach((page) => {
       Object.keys(formData[page]).forEach((questionId) => {
         const answer = formData[page][questionId]?.answer;
-        if (!answer || (Array.isArray(answer) && answer.length === 0)) {
+        const isRequired = formData[page][questionId]?.validationSettings?.isRequired;
+  
+        // Exclude non-required fields from the check
+        if (isRequired && (!answer || (Array.isArray(answer) && answer.length === 0))) {
           allFieldsFilled = false;
         }
       });
     });
     setFieldsCompleted(allFieldsFilled);
   };
+  
 
-  const handleOptionChange = (questionId, value, page) => {
+  
+//handle option change
+  const handleOptionChange = (questionId, value, page, validateSettings) => {
+
+    let errorMessage = "";
+console.log("handleOptionChange",validateSettings,"questionid",questionId,"page",page);
+
+
+    const { maxLength, regexPattern,isRequired  } = validateSettings || {};
+
+    if (isRequired) {
+      if (!value || (Array.isArray(value) && value.length === 0)) {
+        errorMessage = "This field is required";
+      }
+    }
+  
+    //check for length
+    if (value.length > maxLength) {
+      errorMessage = `Maximum length exceeded (${maxLength} characters allowed)`;
+      console.log("value.length");
+    }
+
+    if (regexPattern) {
+
+      const regex = new RegExp(regexPattern);
+      if (!regex.test(value)) {
+        errorMessage = `Give valid regexPattern of ${regexPattern}`;
+
+      }
+    }
+
+    setFieldErrors((prevErrors) => ({
+      ...prevErrors,
+      [`${page}_${questionId}`]: errorMessage,
+    }));
+
     setCompleteFormDataContext((prevFormData) => {
       const updatedFormData = { ...prevFormData };
       if (!updatedFormData[page]) {
@@ -70,6 +121,8 @@ const [emailError, setEmailError] = useState('');
       return updatedFormData;
     });
   };
+
+  
 
   let typingTimeout;
 
@@ -99,38 +152,19 @@ const [emailError, setEmailError] = useState('');
     console.log("userName", userName);
   };
 
-  const handleEmailChange = (e) => {
-    const newEmail = e.target.value;
-    setEmail(newEmail);
-  
-    // Perform email validation
-    const emailRegex = /^[a-zA-Z0-9._-]+@[gmail]+\.[com]{3}$/ ; 
-    const isValidEmail = emailRegex.test(newEmail);
-  
-    if (!isValidEmail) {
-      setEmailError('Please enter a valid email address.');
-    } else {
-      setEmailError('');
-    }
-  };
-  // const handleDescriptionChange = (questionId, value, page) => {
-  //   setCompleteFormDataContext((prevFormData) => {
-  //     const updatedFormData = { ...prevFormData };
-  //     if (!updatedFormData[page]) {
-  //       updatedFormData[page] = {};
-  //     }
-  //     updatedFormData[page][questionId] = {
-  //       ...updatedFormData[page][questionId],
-  //       textDescription: value,
-  //     };
-  //     return updatedFormData;
-  //   });
-  // };
+
 
   const handleSubmit = () => {
-    const combinedObject = { ...wizardData, completeFormDataContext };
-    axios
-      .post(`http://localhost:8080/saveData/${userId}`, combinedObject, {
+    setShowModal(true); 
+  };
+
+  const handleSubmission = () => {
+    
+    if (apiEndpoint.trim() !== "") {
+      const combinedObject = { ...wizardData, completeFormDataContext };
+
+      //save whole data with id
+    axios.post(`http://localhost:8080/saveData/${userId}`, combinedObject, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -146,26 +180,40 @@ const [emailError, setEmailError] = useState('');
         console.log("Error sending data to the backend", error.message);
       });
 
-    axios
-      .post(
-        `http://localhost:8080/saveUserRes/${userId}/${userName}`,
-        combinedObject,
-        {
+      //save res of perticular user with id
+    axios.post(`http://localhost:8080/saveUserRes/${userId}/${userName}`,combinedObject,{
           headers: {
             "Content-Type": "application/json",
           },
         }
       )
       .then((response) => {
-        console.log(
-          "Data sent to the backend successfully with answer",
-          response.data
-        );
+        console.log("Data sent to the backend successfully with answer",response.data);
+        alert(response.data)
         navigate("/");
       })
       .catch((error) => {
         console.log("Error sending data to the backend", error.message);
+        alert(error.message)
       });
+
+      //save res to a particular API
+      axios.post(`${apiEndpoint}`,combinedObject,{
+        headers:{
+          "Content-Type":"application/json",
+        },
+      })
+      .then((res)=>{
+        console.log("Data sent to the backend successfully with answer",res.data);
+      })
+      .catch((e)=>{
+        console.log("Error sending data to the backend", e.message);
+      })
+      console.log("Chosen API Endpoint:", apiEndpoint);
+      setShowModal(false);
+    } else {
+      alert("Endpoint cannot be empty");
+    }
   };
 
   const handleBack = () => {
@@ -173,19 +221,23 @@ const [emailError, setEmailError] = useState('');
   };
 
   //render question----------
-  const renderQuestion = (questionId, questionData, page, questionNo) => {
-    console.log("here");
+  const renderQuestion = (questionId,questionData,page,questionNo,validateSettings) => {
+
+    // console.log("validate settinf", validateSettings);
+    // console.log("here");
     if (
       !completeFormDataContext ||
       !completeFormDataContext[page] ||
       !questionData ||
-      (questionData.type !== "textarea" &&
-        questionData.type !== "textbox" &&
-        !Array.isArray(questionData.options))
-    ) {
+      // !completeFormDataContext[validateSettings]||
+      (questionData.type !== "textarea" && questionData.type !== "textbox" && !Array.isArray(questionData.options))) {
       return null;
     }
     const { type, question, options } = questionData;
+
+    const isRequired = validateSettings?.isRequired;
+
+    const questionLabel = isRequired ? `${question} *` : question;
 
     const handleInputChange = (value) => {
       handleOptionChange(questionId, value, page);
@@ -200,8 +252,12 @@ const [emailError, setEmailError] = useState('');
             <div style={{ display: "flex", gap: "5px" }}>
               <Typography>{questionNo + "."}</Typography>
               <Typography variant="body1" gutterBottom>
-                {question}
+                {questionLabel}
+                {/* {question} {questionData.isRequired && "*"} */}
               </Typography>
+              {/* <Typography variant="body1" gutterBottom>
+                {question}
+              </Typography> */}
             </div>
             {console.log(
               "textFiled se pehle",
@@ -212,8 +268,17 @@ const [emailError, setEmailError] = useState('');
               variant="outlined"
               value={completeFormDataContext[page][questionId]?.answer || ""}
               onChange={(e) =>
-                handleOptionChange(questionId, e.target.value, page)
+                handleOptionChange(
+                  questionId,
+                  e.target.value,
+                  page,
+                  validateSettings
+                )
               }
+
+              error={fieldErrors[`${page}_${questionId}`] !== ""}
+              helperText={fieldErrors[`${page}_${questionId}`]}
+              
             />
           </div>
         );
@@ -223,7 +288,8 @@ const [emailError, setEmailError] = useState('');
             <div style={{ display: "flex", gap: "5px" }}>
               <Typography>{questionNo + "."}</Typography>
               <Typography variant="body1" gutterBottom>
-                {question}
+              {questionLabel}
+                {/* {question} */}
               </Typography>
             </div>
             <TextField
@@ -233,39 +299,14 @@ const [emailError, setEmailError] = useState('');
               rows={4}
               value={completeFormDataContext[page][questionId]?.answer || ""}
               onChange={(e) => {
-                handleOptionChange(questionId, e.target.value, page);
+                handleOptionChange(questionId, e.target.value, page,validateSettings);
               }}
               sx={{ mb: 2, marginTop: "10px" }}
+              error={fieldErrors[`${page}_${questionId}`] !== ""}
+              helperText={fieldErrors[`${page}_${questionId}`]}
             />
           </div>
         );
-
-      // case "textarea":
-      // return (
-      //   <div key={questionId} style={{ marginBottom: "20px" }}>
-      //     <div style={{display:'flex',gap:'5px'}}>
-      //     <Typography>
-      //       {questionNo+"."}
-      //     </Typography>
-      //     <Typography variant="body1" gutterBottom>
-      //       {question}
-      //     </Typography>
-      //     </div>
-      //     <TextField
-      //       label="Text Description"
-      //       fullWidth
-      //       multiline
-      //       rows={4}
-      //       value={
-      //         completeFormDataContext[page][questionId]?.textDescription || ""
-      //       }
-      //       onChange={(e) => {
-      //         handleDescriptionChange(questionId, e.target.value, page);
-      //       }}
-      //       sx={{ mb: 2,marginTop:'10px' }}
-      //     />
-      //   </div>
-      // );
 
       case "dropdown":
         return (
@@ -299,38 +340,52 @@ const [emailError, setEmailError] = useState('');
           </div>
         );
 
-      case "checkbox":
-        return (
-          <div key={questionId} style={{ marginBottom: "20px" }}>
-            <div style={{ display: "flex", gap: "5px" }}>
-              <Typography>{questionNo + "."}</Typography>
-              <Typography variant="body1" gutterBottom>
-                {question}
-              </Typography>
-            </div>
-            <FormGroup>
-              {options.map((option, index) => (
-                <FormControlLabel
-                  key={index}
-                  control={
-                    <Checkbox
-                      checked={
-                        completeFormDataContext[page][questionId]?.answer ===
-                        option
+        case "checkbox":
+          return (
+            <div key={questionId} style={{ marginBottom: "20px" }}>
+              <div style={{ display: "flex", gap: "5px" }}>
+                <Typography>{questionNo + "."}</Typography>
+                <Typography variant="body1" gutterBottom>
+                  {question}
+                </Typography>
+                {validateSettings?.isRequired && (
+                  <span style={{ color: "red" }}>*</span>
+                )}
+              </div>
+              <FormGroup>
+                {options.map((option, index) => {
+                  const isChecked =
+                    completeFormDataContext[page][questionId]?.answer === option;
+                  return (
+                    <FormControlLabel
+                      key={index}
+                      control={
+                        <Checkbox
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const checkedOption = e.target.checked ? option : "";
+                            handleInputChange(checkedOption);
+                          }}
+                          name={option}
+                        />
                       }
-                      onChange={(e) => {
-                        const checkedOption = e.target.checked ? option : "";
-                        handleInputChange(checkedOption);
-                      }}
-                      name={option}
+                      label={option}
                     />
-                  }
-                  label={option}
-                />
-              ))}
-            </FormGroup>
-          </div>
-        );
+                  );
+                })}
+              </FormGroup>
+              {validateSettings?.isRequired &&
+                !options.some(
+                  (option) =>
+                    completeFormDataContext[page][questionId]?.answer === option
+                ) && (
+                  <div style={{ color: "red", marginTop: "3px",fontSize:'13px' }}>
+                    This field is required.
+                  </div>
+                )}
+            </div>
+          );
+        
 
       case "radio":
         return (
@@ -436,17 +491,17 @@ const [emailError, setEmailError] = useState('');
   };
 
   const handleNextDisable = () => {
+    // console.log("isAPANkJ areAllFieldsValid",areAllFieldsValid);
+    // console.log("pankaj  hasfieldValue",hasFalseValue);
     return currentPage === arrayOfPages[arrayOfPages.length - 1];
   };
+  
 
   // const renderUserNamePage = () => {
   //   if (currentPage !== 1) {
   //     return null;
   //   }
 
-  const isPage0Valid = () => {
-    return !userNameError && !emailError && userName && email;
-  };
   //render Page 0-------------
   const renderUserNamePage = () => {
     if (currentPage !== 0) {
@@ -481,34 +536,13 @@ const [emailError, setEmailError] = useState('');
             </div>
           </div>
 
-          <div key="question-email">
-            <div>
-              <Typography variant="body1" gutterBottom>
-                Enter Your Email:
-              </Typography>
-              <TextField
-                fullWidth
-                variant="outlined"
-                value={email}
-                onChange={handleEmailChange}
-              />
-              {emailError && (
-                <div
-                  style={{ color: "red", marginTop: "2px", fontSize: "15px" }}
-                >
-                  {emailError}
-                </div>
-              )}
-            </div>
-          </div>
-
           <div style={{ marginTop: "20px" }}>
             <Button
               variant="outlined"
               color="primary"
               onClick={handleNextPage}
-              // disabled={!userName}
-              disabled={!isPage0Valid()}
+              disabled={!userName || !!userNameError}
+              // disabled={!isPage0Valid()}
             >
               Next
             </Button>
@@ -526,12 +560,53 @@ const [emailError, setEmailError] = useState('');
   // },[currentPage])
 
   useEffect(() => {
-    console.log("all question", Object.keys(completeFormDataContext[1]));
-    console.log(
-      "all question value",
-      Object.values(completeFormDataContext[1])
-    );
-  }, []);
+    //validationon initial load
+    const initialFieldErrors = {};
+  
+    // Loop through existing data to get initial errors
+    Object.keys(completeFormDataContext).forEach((page) => {
+      Object.keys(completeFormDataContext[page]).forEach((questionId) => {
+        const answer = completeFormDataContext[page][questionId]?.answer || '';
+        const validateSettings = completeFormDataContext[page][questionId]?.validationSettings || {};
+  
+       
+        const { maxLength, regexPattern, isRequired } = validateSettings;
+        let errorMessage = '';
+  
+        
+        if (isRequired && (!answer || (Array.isArray(answer) && answer.length === 0))) {
+          errorMessage = 'This field is required';
+        }
+  
+        
+        if (maxLength && answer.length > maxLength) {
+          errorMessage = `Maximum length exceeded (${maxLength} characters allowed)`;
+        }
+  
+        
+        if (regexPattern) {
+          const regex = new RegExp(regexPattern);
+          if (!regex.test(answer)) {
+            errorMessage = `Invalid input, please give the specified pattern`;
+          }
+        }
+
+        initialFieldErrors[`${page}_${questionId}`] = errorMessage;
+      });
+    });
+  
+    // Set initial field errors
+    setFieldErrors(initialFieldErrors);
+  }, [completeFormDataContext]);
+
+  // useEffect(() => {
+  //   console.log("all question", Object.keys(completeFormDataContext[1]));
+  //   console.log(
+  //     "all question value",
+  //     Object.values(completeFormDataContext[1])
+  //   );
+  // }, []);
+
   useEffect(() => {
     if (userNAME && userName !== userNAME) {
       setUserName(userNAME);
@@ -577,17 +652,24 @@ const [emailError, setEmailError] = useState('');
                   </div>
                   <div key={`page-${page}`} className="user_form_questions">
                     <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
-                      {"PAGE " + pageNumber}
+                      {"PAGE " + pageNumber +"currentPage"+currentPage}
                     </div>
+                    {console.log("question of--",questions)}
 
                     {questions.map((questionId, index) => (
                       <div key={`question-${questionId}`}>
                         {console.log("question not map", questionId)}
+                        {console.log(
+                          "hhhhhhhhhh",
+                          completeFormDataContext[page][questionId]
+                        )}
                         {renderQuestion(
                           questionId,
                           completeFormDataContext[page][questionId],
                           page,
-                          index + 1
+                          index + 1,
+                          completeFormDataContext[page][questionId]
+                            .validationSettings
                         )}
                       </div>
                     ))}
@@ -614,20 +696,22 @@ const [emailError, setEmailError] = useState('');
                           variant="outlined"
                           color="primary"
                           onClick={handleSubmit}
-                          disabled={!fieldsCompleted}
+                          // disabled={!fieldsCompleted || !isValidField}
+                          // disabled={!isValidField}
+                          disabled={
+                            // !isAnyFieldFilled() ||
+                            // !areAllFieldsValid() ||
+                            !hasFieldErrors||
+                            
+                            !fieldsCompleted 
+                            
+                          }
                         >
                           Submit
                         </Button>
                       )}
 
-                      {/* <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={handleSubmit}
-                        disabled={!handleNextDisable()}
-                      >
-                        Submit
-                      </Button> */}
+                      
                       <Button
                         variant="outlined"
                         color="primary"
@@ -641,6 +725,7 @@ const [emailError, setEmailError] = useState('');
                         color="primary"
                         onClick={handleNextPage}
                         disabled={handleNextDisable()}
+                        // disabled={!hasFalseValue}
                       >
                         Next
                       </Button>
@@ -651,6 +736,49 @@ const [emailError, setEmailError] = useState('');
             })}
         </div>
       </div>
+
+
+      <Button
+        variant="outlined"
+        color="primary"
+        onClick={handleSubmit}
+        disabled={!fieldsCompleted}
+      >
+        Submitq
+      </Button>
+
+      {/* Modal for choosing API Endpoint */}
+      <Modal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box sx={{ width: 300, bgcolor: "background.paper", p: 4 }}>
+          <h3 id="modal-modal-title" style={{marginBottom:'10px'}}>Enter API Endpoint</h3>
+          
+          <TextField
+            label="API Endpoint"
+            variant="outlined"
+            value={apiEndpoint}
+            onChange={(e) => setApiEndpoint(e.target.value)}
+            fullWidth
+            sx={{ mb: 2,marginBottom:'10px' }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmission}
+          >
+            Submit
+          </Button>
+        </Box>
+      </Modal>
     </div>
   );
 };

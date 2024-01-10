@@ -51,15 +51,15 @@
 //     if (!e.question || e.question.trim() === "") {
 //       newErrors.question = "Question field can't be empty";
 //       textValid = false;
-//     } 
+//     }
 //     else if (!/^[a-zA-Z]/.test(e.question)) {
 //       newErrors.question = "Qusetion should start with a letter";
 //       textValid = false;
-//     } 
+//     }
 //     else if (e.question[0] !== e.question[0].toUpperCase()) {
 //       newErrors.question = "Question should start with uppercase character";
 //       textValid = false;
-//     } 
+//     }
 //     else if(/^\d/.test(e.question)){
 //       newErrors.question = "Question shout not start with a number"
 //     }
@@ -126,19 +126,17 @@
 //     const updatedOptions = [...formData.options];
 //     updatedOptions.splice(index, 1);
 //     setFormData({ ...formData, options: updatedOptions });
-  
+
 //     setCompleteFormDataContext((prevContext) => {
 //       const updatedContext = { ...prevContext };
 //       const currentPageData = { ...updatedContext[currentCount] };
-  
-      
+
 //       if (currentPageData && currentPageData[uid]) {
 //         const currentPageOptions = [...currentPageData[uid].options];
-        
+
 //         console.log("remove option",currentPageData[uid]);
 //         console.log("index",index,"uid",uid);
 
-        
 //         if (currentPageOptions) {
 //           currentPageOptions.splice(index, 1);
 //           currentPageData[uid].options = currentPageOptions;
@@ -148,12 +146,11 @@
 //           return updatedContext;
 //         }
 //       }
-      
+
 //       // Return the unchanged context
 //       return prevContext;
 //     });
 //   };
-  
 
 //   const updateCompleteFormData = (uid, updatedData) => {
 //     setId(id + 1);
@@ -287,35 +284,59 @@
 
 // export default TextBoxes;
 
-
-import React, { useState, useContext, useEffect } from 'react';
-import { Typography, TextField, Box } from '@mui/material';
-import { WizardContext } from '../../Context/WizardContext';
+import React, { useState, useContext, useEffect } from "react";
+import {
+  Typography,
+  TextField,
+  Box,
+  FormControlLabel,
+  Checkbox,
+  Button,
+  Modal,
+} from "@mui/material";
+import { WizardContext } from "../../Context/WizardContext";
 
 const TextBoxes = (props) => {
 
-  const [errors,setErrors] = useState({});
+  const [isRequired, setIsRequired] = useState(false);
+
+  const [validationModalOpen, setValidationModalOpen] = useState(false);
+  const [validationSettings, setValidationSettings] = useState({
+    regexPattern: "",
+    maxLength: 10,
+    isRequired: false,
+  });
+
+  const [errors, setErrors] = useState({});
 
   // Global state,
-  const { setIsValid,selectedComponents,completeFormDataContext,setId,id, setCompleteFormDataContext,currentCount} = useContext(WizardContext);
+  const {
+    setIsValid,
+    selectedComponents,
+    completeFormDataContext,
+    setId,
+    id,
+    setCompleteFormDataContext,
+    currentCount,
+  } = useContext(WizardContext);
 
-console.log("textBox props",props);
+  console.log("textBox props", props);
 
   // Local state
   const [formData, setFormData] = useState({
-    page:currentCount,
-    type:'textbox',
-    question: Object.keys(props).includes('question')?props.question:'',
-    textDescription: Object.keys(props).includes('textDescription')?props.textDescription:'',
+    page: currentCount,
+    type: "textbox",
+    question: Object.keys(props).includes("question") ? props.question : "",
+    textDescription: Object.keys(props).includes("textDescription")
+      ? props.textDescription
+      : "",
     //options: Object.keys(props).includes('options')?props.options:[],
     Uid: props.uniqueId,
-    answer:Object.keys(props).includes('answer')?props.answer:'',
-    
+    answer: Object.keys(props).includes("answer") ? props.answer : "",
   });
 
   //validate question
-  const validateTextboxForm = (e) =>{
-
+  const validateTextboxForm = (e) => {
     let textValid = true;
     const newErrors = {};
 
@@ -335,10 +356,9 @@ console.log("textBox props",props);
       textValid = false;
     }
 
-
     setErrors(newErrors);
     return textValid;
-  }
+  };
 
   const handleQuestionChange = (e) => {
     setFormData({ ...formData, question: e.target.value });
@@ -348,7 +368,7 @@ console.log("textBox props",props);
     });
 
     //validate question
-    setIsValid(validateTextboxForm({question : e.target.value}));
+    setIsValid(validateTextboxForm({ question: e.target.value }));
   };
 
   // const handleDescriptionChange = (e) => {
@@ -359,12 +379,81 @@ console.log("textBox props",props);
   //   });
   // };
 
+  const handleRequiredToggle = () => {
+    setIsRequired(!isRequired);
+
+    setValidationSettings({ ...validationSettings, isRequired: !isRequired });
+  };
+
+  const handleValidationModalOpen = () => {
+    setValidationModalOpen(true);
+  };
+
+  const handleValidationModalClose = () => {
+    setValidationModalOpen(false);
+  };
+
+  const handleSaveValidationSettings = () => {
+    updateCompleteFormData(formData.Uid, {
+      ...formData,
+      validationSettings: {
+        ...validationSettings,
+        isRequired: isRequired,
+      },
+    });
+
+    setValidationModalOpen(false);
+  };
+
+  const handleValidationInputChange = (e) => {
+    setValidationSettings({
+      ...validationSettings,
+      maxLength: e.target.value,
+    });
+  };
+
+  const checkRegex = (newRegexPattern) => {
+    try {
+      new RegExp(newRegexPattern);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const handleRegexChange = (e) => {
+    const newRegexPattern = e.target.value;
+    let regexError = "";
+    if (checkRegex(newRegexPattern)){
+      console.log("iffffff");
+      setValidationSettings({
+        ...validationSettings,
+        regexPattern: e.target.value,
+      });
+    }
+    else{
+      console.log("elseeeee");
+      regexError = "Invalid regex pattern";
+    }
+
+    setErrors({ ...errors, regex: regexError });
+  };
+
   const updateCompleteFormData = (uid, updatedData) => {
     setId(id + 1);
     console.log("id", id);
-    console.log("ccccc",completeFormDataContext,"insert",formData.page,"pre",uid,"--",updatedData);
+    console.log(
+      "ccccc",
+      completeFormDataContext,
+      "insert",
+      formData.page,
+      "pre",
+      uid,
+      "--",
+      updatedData
+    );
     // if(uid && updatedData){
-      
+
     setCompleteFormDataContext((prevContext) => ({
       ...prevContext,
       [formData.page]: {
@@ -376,17 +465,19 @@ console.log("textBox props",props);
 
   useEffect(() => {
     updateCompleteFormData(formData.Uid, formData);
-    const allCheckBox = selectedComponents.filter((element)=>element.type.name==='TextBoxes');
+    const allCheckBox = selectedComponents.filter(
+      (element) => element.type.name === "TextBoxes"
+    );
     let validationStatus = true;
-    allCheckBox.forEach((checkbox)=>{
-      const validationValue = validateTextboxForm({question: checkbox.props.question})
-      validationStatus = validationStatus && validationValue
-      if(!validationStatus)
-        return;
-    })
+    allCheckBox.forEach((checkbox) => {
+      const validationValue = validateTextboxForm({
+        question: checkbox.props.question,
+      });
+      validationStatus = validationStatus && validationValue;
+      if (!validationStatus) return;
+    });
     setIsValid(validationStatus);
   }, []);
-
 
   // useEffect(()=>{
   //   console.log("ssssss");
@@ -399,12 +490,21 @@ console.log("textBox props",props);
   // },[formData])
 
   return (
-    <Box sx={{ maxWidth: 600, margin: 'auto', padding: '20px', backgroundColor: '#F3F5F0', borderRadius: '8px', boxShadow: '0px 3px 6px #00000029' }}>
+    <Box
+      sx={{
+        maxWidth: 600,
+        margin: "auto",
+        padding: "20px",
+        backgroundColor: "#F3F5F0",
+        borderRadius: "8px",
+        boxShadow: "0px 3px 6px #00000029",
+      }}
+    >
       <Typography variant="h5" gutterBottom>
         Create Your TextBoxes Wizard
       </Typography>
       <form>
-        <div style={{display:'flex',flexDirection:'column'}}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <TextField
             label="Question"
             fullWidth
@@ -416,9 +516,78 @@ console.log("textBox props",props);
             error={Boolean(errors.question)}
             helperText={errors.question}
           />
-          
+          {/* <FormControlLabel
+            control={
+              <Checkbox
+                checked={isRequired}
+                onChange={handleRequiredToggle}
+                color="primary"
+              />
+            }
+            label="Required"
+          /> */}
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleValidationModalOpen}
+          >
+            Client Side Validation
+          </Button>
         </div>
       </form>
+
+      <Modal
+        open={validationModalOpen}
+        onClose={handleValidationModalClose}
+        aria-labelledby="validation-modal-title"
+        aria-describedby="validation-modal-description"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box sx={{ width: 300, bgcolor: "background.paper", p: 3 }}>
+          <h3 style={{ paddingBottom: "10px" }} id="validation-modal-title">
+            Validation Settings
+          </h3>
+          <TextField
+            label="Max Length"
+            name="maxLength"
+            value={validationSettings.maxLength}
+            onChange={handleValidationInputChange}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Regex Pattern"
+            variant="outlined"
+            fullWidth
+            value={validationSettings.regexPattern}
+            onChange={handleRegexChange}
+            sx={{ mt: 2 }}
+            error={Boolean(errors.regex)}
+            helperText={errors.regex}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isRequired}
+                onChange={handleRequiredToggle}
+                color="primary"
+              />
+            }
+            label="Required"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveValidationSettings}
+          >
+            Save
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 };
